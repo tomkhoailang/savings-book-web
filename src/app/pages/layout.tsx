@@ -13,7 +13,7 @@ export default function RootLayout({
       </div>
       <div className="flex-grow">
         <BreadCumb />
-        {children}
+        <div className="m-2">{children}</div>
       </div>
     </div>
   )

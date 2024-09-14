@@ -21,6 +21,7 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 import { Form } from "@/components/ui/form"
 import TextInput from "@/components/custom/InputText"
 import { log } from "console"
+import { ThemeToggle } from "@/components/custom/ThemeToggle"
 
 const registerFormSchema = z
   .object({

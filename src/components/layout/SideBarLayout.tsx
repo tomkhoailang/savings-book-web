@@ -39,7 +39,7 @@ const SideBarLayout = () => {
         onClick={onClickMenu}
       />
       <div
-        className={`fixed inset-0 md:w-48 md:border-r-2 md:shadow-sm transition-transform duration-300 ease-in-out  ${
+        className={`fixed inset-0 md:w-48 md:border-r-2  transition-transform duration-300 ease-in-out  ${
           isMenuOpen ? "translate-x-0" : "-translate-x-full"
         } md:translate-x-0`}
       >
@@ -54,13 +54,13 @@ const SideBarLayout = () => {
             ></Image>
             <Button
               variant="ghost"
-              className="absolute top-0 right-0 text-cyan-950 md:hidden"
+              className="absolute top-0 right-0 text-cyan-950 md:hidden mt-2"
               onClick={onClickMenu}
             >
               <X size={24} />
             </Button>
           </div>
-          <div className="sidebar-component bg-black  flex flex-col gap-2 grow">
+          <div className="sidebar-component flex flex-col gap-2 grow">
             <div className="parent-group  p-3 border-b-2 ">
               <div className="text-xs mb-2">Dashboard</div>
               <div className="text-sm flex flex-row space-x-2 items-center">
@@ -106,7 +106,6 @@ const SideBarLayout = () => {
                 <div>Roles</div>
               </div>
             </div>
-            <ThemeToggle />
           </div>
           <div className="profile-component w-full">
             <DropdownMenu>

@@ -1,23 +1,7 @@
 "use client"
 import { BedSingle, ChevronUp, X } from "lucide-react"
 
-import {
-  Cloud,
-  CreditCard,
-  Github,
-  Keyboard,
-  LifeBuoy,
-  LogOut,
-  Mail,
-  MessageSquare,
-  Plus,
-  PlusCircle,
-  Settings,
-  User,
-  Menu,
-  UserPlus,
-  Users,
-} from "lucide-react"
+import { CreditCard, LogOut, Settings, User, Menu } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -35,9 +19,10 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import Image from "next/image"
-import { useRef, useState } from "react"
+import { useState } from "react"
+import { ThemeToggle } from "../custom/ThemeToggle"
 
-const LeftSideBar = () => {
+const SideBarLayout = () => {
   const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false)
 
   const onClickMenu = () => {
@@ -45,7 +30,7 @@ const LeftSideBar = () => {
   }
 
   return (
-    <div>
+    <>
       <Menu
         size={40}
         className={`md:hidden h-12 cursor-pointer ${
@@ -54,12 +39,12 @@ const LeftSideBar = () => {
         onClick={onClickMenu}
       />
       <div
-        className={`fixed inset-0  z-50 md:w-48 md:border-r-2 md:shadow-sm transition-transform duration-300 ease-in-out  ${
+        className={`fixed inset-0 md:w-48 md:border-r-2 md:shadow-sm transition-transform duration-300 ease-in-out  ${
           isMenuOpen ? "translate-x-0" : "-translate-x-full"
         } md:translate-x-0`}
       >
         <div className={`flex flex-col w-full h-full `}>
-          <div className="h-24 w-full border-b-2 relative m-0">
+          <div className="h-24 w-full relative m-0">
             <Image
               src="/images/master_card_1.png"
               alt="master"
@@ -121,6 +106,7 @@ const LeftSideBar = () => {
                 <div>Roles</div>
               </div>
             </div>
+            <ThemeToggle />
           </div>
           <div className="profile-component w-full">
             <DropdownMenu>
@@ -149,6 +135,8 @@ const LeftSideBar = () => {
                   </DropdownMenuItem>
                 </DropdownMenuGroup>
                 <DropdownMenuSeparator />
+                <DropdownMenuItem></DropdownMenuItem>
+                <DropdownMenuSeparator />
                 <DropdownMenuItem>
                   <LogOut className="mr-2 h-4 w-4" />
                   <span>Log out</span>
@@ -158,8 +146,8 @@ const LeftSideBar = () => {
           </div>
         </div>
       </div>
-    </div>
+    </>
   )
 }
 
-export default LeftSideBar
+export default SideBarLayout

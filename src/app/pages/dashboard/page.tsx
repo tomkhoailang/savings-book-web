@@ -1,7 +1,10 @@
-import LeftSideBar from "@/components/custom/Sidebar"
-
 const Dashboard = () => {
-  return <div></div>
+  return (
+    <div>
+      chao munchao mung den voichao mung den voichao mung den voichao mung den
+      voichao mung den voichao mung den voig den voi
+    </div>
+  )
 }
 
 export default Dashboard

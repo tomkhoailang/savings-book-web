@@ -1,4 +1,5 @@
-import LeftSideBar from "@/components/custom/Sidebar"
+import BreadCumb from "@/components/custom/BreadCumb"
+import SideBarLayout from "@/components/layout/SideBarLayout"
 
 export default function RootLayout({
   children,
@@ -6,9 +7,14 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <>
-      <LeftSideBar />
-      {children}
-    </>
+    <div className="min-h-screen flex">
+      <div className="w-48 flex-shrink-0">
+        <SideBarLayout />
+      </div>
+      <div className="flex-grow">
+        <BreadCumb />
+        {children}
+      </div>
+    </div>
   )
 }

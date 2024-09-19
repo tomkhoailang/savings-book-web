@@ -7,13 +7,13 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <div className="min-h-screen flex">
+    <div className="min-h-screen flex ">
       <div className="w-48 flex-shrink-0">
         <SideBarLayout />
       </div>
-      <div className="flex-grow">
+      <div className="flex-grow ">
         <BreadCumb />
-        <div className="m-2">{children}</div>
+        <div className=" m-2">{children}</div>
       </div>
     </div>
   )

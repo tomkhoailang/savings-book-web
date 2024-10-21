@@ -1,7 +1,9 @@
 import type { Metadata } from "next"
 import "./globals.css"
-import { ThemeProvider } from "@/components/custom/theme-provider"
+import { ThemeProvider } from "@/components/common/theme-provider"
 import { Inter } from "next/font/google"
+import { Toaster } from "@/components/ui/toaster"
+import AuthProvider from "./contexts/authContext"
 
 const inter = Inter({ subsets: ["vietnamese"], weight: ["100", "300"] })
 
@@ -24,7 +26,8 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          {children}
+          <AuthProvider>{children}</AuthProvider>
+          <Toaster />
         </ThemeProvider>
       </body>
     </html>

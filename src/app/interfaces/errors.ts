@@ -1,0 +1,3 @@
+interface ErrorResponse {
+  error: string
+}

@@ -19,9 +19,15 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import Image from "next/image"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Form } from "@/components/ui/form"
-import TextInput from "@/components/custom/InputText"
+import TextInput from "@/components/common/InputText"
 import { log } from "console"
-import { ThemeToggle } from "@/components/custom/ThemeToggle"
+import { ThemeToggle } from "@/components/common/ThemeToggle"
+import proxyService from "@/app/services/proxyService"
+import { useState } from "react"
+import LoadingButton from "@/components/common/LoadingButton"
+import { useToast } from "@/hooks/use-toast"
+import { useAuth } from "@/app/contexts/authContext"
+import { useRouter } from "next/navigation"
 
 const registerFormSchema = z
   .object({
@@ -101,6 +107,16 @@ type RegisterFormValues = z.infer<typeof registerFormSchema>
 type LoginFormValues = z.infer<typeof loginFormSchema>
 
 const Login = () => {
+  const router = useRouter()
+  const [loading, setLoading] = useState(false)
+  const [activeTab, setActiveTab] = useState("login")
+  const { toast } = useToast()
+  const authContext = useAuth()
+
+  const handleTabChange = (tab: string) => {
+    setActiveTab(tab)
+  }
+
   const registerForm = useForm<RegisterFormValues>({
     resolver: zodResolver(registerFormSchema),
     defaultValues: {
@@ -118,13 +134,59 @@ const Login = () => {
       rememberPassword: false,
     },
   })
-  const onRegisterFormSubmit = (values: RegisterFormValues) => {
-    console.log("test register")
-    console.log(values)
+  const onRegisterFormSubmit = async (values: RegisterFormValues) => {
+    setLoading(true)
+
+    const res = await proxyService.post("/auth/register", values)
+    const content: ErrorResponse = await res.json()
+
+    if (!res.ok) {
+      toast({
+        title: "Error",
+        description: content.error,
+        duration: 1500,
+        className: "w-1/6 fixed top-8 right-16 bg-red-500 text-white",
+      })
+    } else {
+      toast({
+        title: "Sign up complete",
+        description: "Your account is created successfully",
+        duration: 1500,
+        className: "w-1/4 fixed top-8 right-16 bg-green-500 text-white",
+      })
+      setActiveTab("login")
+      registerForm.reset()
+      loginForm.reset()
+      loginForm.setValue("username", values.username)
+    }
+    setLoading(false)
   }
-  const onLoginFormSubmit = (values: LoginFormValues) => {
-    console.log("check login")
-    console.log(values)
+  const onLoginFormSubmit = async (values: LoginFormValues) => {
+    setLoading(true)
+
+    const res = await proxyService.post("/auth/login", values)
+    const content = await res.json()
+
+    if (!res.ok) {
+      const errorContent = content as ErrorResponse
+      toast({
+        title: "Error",
+        description: errorContent.error,
+        duration: 1500,
+        className: "w-1/6 fixed top-8 right-16 bg-red-500 text-white",
+      })
+    } else {
+      const loginContent = content as LoginResponse
+      toast({
+        title: "Login successfully",
+        description: "Your will be redirect to dashboard soon",
+        duration: 1500,
+        className: "w-1/4 fixed top-8 right-16 bg-green-500 text-white",
+      })
+      authContext?.login(loginContent.access_token, loginContent.refresh_token)
+      router.push("/pages/dashboard")
+    }
+    setLoading(false)
   }
 
   return (
@@ -137,7 +199,11 @@ const Login = () => {
           height={275}
           className="rounded-lg "
         />
-        <Tabs defaultValue="login" className="w-[275px] mt-2">
+        <Tabs
+          value={activeTab}
+          onValueChange={setActiveTab}
+          className="w-[275px] mt-2"
+        >
           <TabsList className="grid grid-cols-2">
             <TabsTrigger value="login">Login</TabsTrigger>
             <TabsTrigger value="register">Register</TabsTrigger>
@@ -150,8 +216,8 @@ const Login = () => {
                     <TextInput
                       control={loginForm.control}
                       name="username"
-                      label="Username"
-                      placeholder="Username"
+                      label="Username/Email"
+                      placeholder="Username/Email"
                       className="mb-2"
                     />
                   </div>
@@ -183,7 +249,7 @@ const Login = () => {
                   </div>
                   <div className="flex justify-end">
                     <Button type="submit" className="mt-2">
-                      Login to your account
+                      Login
                     </Button>
                   </div>
                 </form>
@@ -239,9 +305,10 @@ const Login = () => {
                       />
                     </div>
                     <div className="flex justify-end">
-                      <Button type="submit" className="mt-2">
-                        Register
-                      </Button>
+                      <LoadingButton
+                        isLoading={loading}
+                        label="Register"
+                      ></LoadingButton>
                     </div>
                   </div>
                 </form>

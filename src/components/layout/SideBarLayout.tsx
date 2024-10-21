@@ -20,10 +20,12 @@ import {
 } from "@/components/ui/dropdown-menu"
 import Image from "next/image"
 import { useState } from "react"
-import { ThemeToggle } from "../custom/ThemeToggle"
+import { ThemeToggle } from "../common/ThemeToggle"
+import { useAuth } from "@/app/contexts/authContext"
 
 const SideBarLayout = () => {
   const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false)
+  const authContext = useAuth()
 
   const onClickMenu = () => {
     setIsMenuOpen(!isMenuOpen)
@@ -138,7 +140,13 @@ const SideBarLayout = () => {
                 <DropdownMenuSeparator />
                 <DropdownMenuItem>
                   <LogOut className="mr-2 h-4 w-4" />
-                  <span>Log out</span>
+                  <span
+                    onClick={() => {
+                      authContext?.logout()
+                    }}
+                  >
+                    Log out
+                  </span>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>

@@ -1,4 +1,4 @@
-import GradientBackground from "@/components/custom/gradient-background"
+import GradientBackground from "@/components/common/gradient-background"
 
 export default function RootLayout({
   children,
@@ -6,5 +6,4 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return <GradientBackground>{children}</GradientBackground>
-
 }

@@ -7,20 +7,18 @@ const buildOptions = (
   params: Record<string, string> = {}
 ): RequestOptions => {
   const options: RequestOptions = { headers: {} }
-  // const token = getToken()
 
-  // if (token) {
-  //   options.headers = { ...headers, Authorization: `Bearer ${token}` }
-  // } else {
-  //   options.headers = headers
-  // }
+  const token = localStorage.getItem("accessToken")
 
-  options.headers = headers
+  if (token) {
+    options.headers = { ...headers, Authorization: `Bearer ${token}` }
+  } else {
+    options.headers = headers
+  }
 
   if (Object.keys(params).length > 0) {
     options.params = params
   }
-
   return options
 }
 
@@ -39,19 +37,14 @@ const proxyService = {
     params: Record<string, string> = {},
     headers: Record<string, string> = {}
   ) => {
-    try {
-      const options = buildOptions(headers, params)
-      const queryString = new URLSearchParams(params).toString()
-      const fullUrl = `${process.env.NEXT_PUBLIC_API_ENDPOINT}${url}${
-        queryString ? `?${queryString}` : ""
-      }`
-
-      const response = await fetch(fullUrl, options)
-      return await handleResponse(response)
-    } catch (e) {
-      console.error("Fetch error", e)
-      throw e
-    }
+    const options = buildOptions(headers, params)
+    const queryString = new URLSearchParams(params).toString()
+    const fullUrl = `${process.env.NEXT_PUBLIC_API_ENDPOINT}${url}${
+      queryString ? `?${queryString}` : ""
+    }`
+    console.log(options)
+    const response = await fetch(fullUrl, options)
+    return response
   },
 
   post: async (
@@ -82,25 +75,20 @@ const proxyService = {
     headers: Record<string, string> = {},
     params: Record<string, string> = {}
   ) => {
-    try {
-      if (!(data instanceof FormData)) {
-        headers = { ...headers, "Content-Type": "application/json" }
-        data = JSON.stringify(data)
-      }
-
-      const options = buildOptions(headers, params)
-      const fullUrl = `${process.env.NEXT_PUBLIC_API_ENDPOINT}${url}`
-
-      const response = await fetch(fullUrl, {
-        method: "PUT",
-        body: data,
-        ...options,
-      })
-      return await handleResponse(response)
-    } catch (e) {
-      console.error("Fetch error", e)
-      throw e
+    if (!(data instanceof FormData)) {
+      headers = { ...headers, "Content-Type": "application/json" }
+      data = JSON.stringify(data)
     }
+
+    const options = buildOptions(headers, params)
+    const fullUrl = `${process.env.NEXT_PUBLIC_API_ENDPOINT}${url}`
+
+    const response = await fetch(fullUrl, {
+      method: "PUT",
+      body: data,
+      ...options,
+    })
+    return response
   },
 
   delete: async (

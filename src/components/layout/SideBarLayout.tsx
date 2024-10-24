@@ -22,13 +22,19 @@ import Image from "next/image"
 import { useState } from "react"
 import { ThemeToggle } from "../common/ThemeToggle"
 import { useAuth } from "@/app/contexts/authContext"
+import { useRouter } from "next/navigation"
+import { string } from "zod"
 
 const SideBarLayout = () => {
   const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false)
   const authContext = useAuth()
+  const router = useRouter()
 
   const onClickMenu = () => {
     setIsMenuOpen(!isMenuOpen)
+  }
+  const onSidebarItemClick = (link: string) => {
+    router.push(`/pages/${link}`)
   }
 
   return (
@@ -75,6 +81,13 @@ const SideBarLayout = () => {
               <div className="text-sm flex flex-row space-x-2 items-center">
                 <BedSingle size={20} className="text-xs" />
                 <div>Mở sổ</div>
+              </div>
+              <div
+                className="text-sm flex flex-row space-x-2 items-center cursor-pointer"
+                onClick={() => onSidebarItemClick("/regulations")}
+              >
+                <BedSingle size={20} className="text-xs" />
+                <div>Regulations</div>
               </div>
               <div className="text-sm flex flex-row space-x-2 items-center">
                 <BedSingle size={20} className="text-xs" />

@@ -23,6 +23,7 @@ interface TextInputProps {
   icon?: any
   maxlength?: number
   required?: boolean
+  inline?: boolean
 }
 
 const TextInput: React.FC<TextInputProps> = ({
@@ -38,6 +39,7 @@ const TextInput: React.FC<TextInputProps> = ({
   icon,
   maxlength,
   required,
+  inline = false,
 }) => {
   return (
     <Controller
@@ -46,47 +48,50 @@ const TextInput: React.FC<TextInputProps> = ({
       defaultValue={defaultValue}
       render={({ field, fieldState: { error, isTouched } }) => {
         return (
-          <>
-            <Label>
+          <div className={`${inline ? "flex items-center" : ""} ${className}`}>
+            <Label className={inline ? "mr-2" : "block"}>
               {label} {required ? <span className="text-red-500">*</span> : ""}
             </Label>
-            {textArea ? (
-              <Textarea
-                placeholder={placeholder}
-                {...field}
-                className={`${componentClassName} ${
-                  error ? "border-red-500" : ""
-                }`}
-              />
-            ) : password ? (
-              <Input
-                type="password"
-                placeholder={placeholder}
-                maxLength={maxlength}
-                {...field}
-                className={`${componentClassName} ${
-                  error ? "border-red-500" : ""
-                }`}
-              />
-            ) : (
-              <Input
-                type="text"
-                placeholder={placeholder}
-                maxLength={maxlength}
-                {...field}
-                className={`${componentClassName} ${
-                  error ? "border-red-500" : ""
-                }`}
-              />
-            )}
+            <div className={inline ? "" : "mt-1"}>
+              {textArea ? (
+                <Textarea
+                  placeholder={placeholder}
+                  {...field}
+                  className={`${componentClassName} ${
+                    error ? "border-red-500" : ""
+                  }`}
+                />
+              ) : password ? (
+                <Input
+                  type="password"
+                  placeholder={placeholder}
+                  maxLength={maxlength}
+                  {...field}
+                  className={`${componentClassName} ${
+                    error ? "border-red-500" : ""
+                  }`}
+                />
+              ) : (
+                <Input
+                  type="text"
+                  placeholder={placeholder}
+                  maxLength={maxlength}
+                  {...field}
+                  className={`${componentClassName} ${
+                    error ? "border-red-500" : ""
+                  }`}
+                />
+              )}
+            </div>
             {error && (
-              <p className="text-red-500 text-xs mt-1 ">{error.message}</p>
+              <p className="text-red-500 text-xs mt-1">{error.message}</p>
             )}
-          </>
+          </div>
         )
       }}
     />
   )
 }
+
 
 export default TextInput

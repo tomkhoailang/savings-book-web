@@ -8,7 +8,14 @@ import {
   DoubleArrowLeftIcon,
   DoubleArrowRightIcon,
 } from "@radix-ui/react-icons"
-
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 import {
   Select,
   SelectContent,
@@ -22,6 +29,7 @@ import {
   flexRender,
   getCoreRowModel,
   getPaginationRowModel,
+  Row,
   useReactTable,
 } from "@tanstack/react-table"
 import {
@@ -38,23 +46,69 @@ import { useToast } from "@/hooks/use-toast"
 import { useDispatch, useSelector } from "react-redux"
 import { RootState } from "@/app/reducers/store"
 import { pageChange, updateTotalRow } from "@/app/reducers/datatableReducer"
+import UpdateModal from "./updateModal"
+import { MoreHorizontal } from "lucide-react"
+import { Metadata } from "@/app/interfaces/metadata"
+import { FieldValues } from "react-hook-form"
 
-interface DataTableProps<TData, TValue> {
+interface DataTableProps<
+  TData extends AuditedEntity,
+  TValue,
+  TFormValues extends FieldValues
+> {
   columns: ColumnDef<TData, TValue>[]
-  metadata: Metadata<TData>
+  metadata: Metadata<TData, TFormValues>
 }
 
-export function DataTable<TData, TValue>({
-  columns,
-  metadata,
-}: DataTableProps<TData, TValue>) {
+export function DataTable<
+  TData extends AuditedEntity,
+  TValue,
+  TFormValues extends FieldValues
+>({ columns, metadata }: DataTableProps<TData, TValue, TFormValues>) {
   const dispatch = useDispatch()
   const datatableReducer = useSelector(
     (state: RootState) => state.datatableReducer
   )
-  console.log(datatableReducer)
 
   const [rowSelection, setRowSelection] = React.useState({})
+  const [selectedRowForUpdate, setSelectedRowForUpdate] =
+    React.useState<TData | null>(null)
+  const [isUpdateModalOpen, setIsUpdateModalOpen] = React.useState(false)
+
+  const updatedColumns: ColumnDef<TData, TValue>[] = columns.map((column) => {
+    if (column.id === "actions") {
+      return {
+        ...column,
+        cell: ({ row }: { row: Row<TData> }) => {
+          const regulation = row.original
+          return (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="h-8 w-8 p-0">
+                  <span className="sr-only">Open menu</span>
+                  <MoreHorizontal className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                <DropdownMenuItem
+                  onClick={() => {
+                    setSelectedRowForUpdate(regulation as TData)
+                    setIsUpdateModalOpen(true)
+                    console.log("test")
+                  }}
+                >
+                  Edit
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )
+        },
+      }
+    }
+    return column
+  })
+
   const [pageSize, setPageSize] = React.useState(25)
   const [data, setData] = React.useState<TData[]>([])
   const [totalCount, setTotalCount] = React.useState(0)
@@ -82,18 +136,27 @@ export function DataTable<TData, TValue>({
       dispatch(updateTotalRow(content.totalCount))
     }
   }
+  const whenClose = (resData: TData) => {
+    const newData = data.map((item) => {
+      if (item.id == resData.id) {
+        return resData
+      }
+      return item
+    })
+    setData(newData)
+  }
 
   useEffect(() => {
-    fetchData(metadata.url)
+    fetchData(metadata.getUrl)
   }, [])
 
   useEffect(() => {
-    fetchData(metadata.url + datatableReducer.query)
+    fetchData(metadata.getUrl + datatableReducer.query)
   }, [datatableReducer.query])
 
   const table = useReactTable({
     data,
-    columns,
+    columns: updatedColumns,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     onRowSelectionChange: setRowSelection,
@@ -269,7 +332,18 @@ export function DataTable<TData, TValue>({
           </div>
         </div>
       </div>
-      {typeof metadata.createUpdateModal == "function" ? "hehe" : "test"}
+
+      {metadata.update !== null ? (
+        <UpdateModal
+          metadata={metadata}
+          isOpen={isUpdateModalOpen}
+          setIsOpen={setIsUpdateModalOpen}
+          dataSource={selectedRowForUpdate}
+          whenClose={whenClose}
+        />
+      ) : (
+        ""
+      )}
     </div>
   )
 }

@@ -24,6 +24,7 @@ interface TextInputProps {
   maxlength?: number
   required?: boolean
   inline?: boolean
+  number?: boolean
 }
 
 const TextInput: React.FC<TextInputProps> = ({
@@ -40,6 +41,7 @@ const TextInput: React.FC<TextInputProps> = ({
   maxlength,
   required,
   inline = false,
+  number = false,
 }) => {
   return (
     <Controller
@@ -70,6 +72,19 @@ const TextInput: React.FC<TextInputProps> = ({
                   className={`${componentClassName} ${
                     error ? "border-red-500" : ""
                   }`}
+                />
+              ) : number ? (
+                <Input
+                  type="number"
+                  placeholder={placeholder}
+                  maxLength={maxlength}
+                  {...field}
+                  className={`${componentClassName} ${
+                    error ? "border-red-500" : ""
+                  }`}
+                  onChange={(e) =>
+                    field.onChange(e.target.value ? Number(e.target.value) : 0)
+                  }
                 />
               ) : (
                 <Input

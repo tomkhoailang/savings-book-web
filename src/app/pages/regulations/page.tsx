@@ -1,5 +1,7 @@
 "use client"
 import moment from "moment"
+import { z } from "zod"
+
 import { useEffect, useState } from "react"
 import { DataTable } from "@/components/common/datatable"
 import {
@@ -36,6 +38,8 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip"
 import { CreateUpdateRegulationModal } from "@/components/regulations/CreateUpdateModal"
+import { Metadata } from "@/app/interfaces/metadata"
+import { zodResolver } from "@hookform/resolvers/zod"
 export interface SavingType {
   name: string
   term: number
@@ -122,7 +126,7 @@ const columns: ColumnDef<SavingRegulation>[] = [
     cell: ({ row }) => {
       const regulation = row.original
       if (regulation.isActive) {
-        return <Check className="text-green-400" />
+        return <Check className="text-green-400 w-full" />
       }
     },
     header: "Active",
@@ -170,15 +174,77 @@ const columns: ColumnDef<SavingRegulation>[] = [
     },
   },
 ]
-const metadata: Metadata<SavingRegulation> = {
-  url: "/regulation",
-  createUpdateModal: (data) => {
-    return <CreateUpdateRegulationModal data={data} />
+
+const SavingTypeFormSchema = z.object({
+  name: z.string(),
+  term: z.number().min(0),
+  interestRate: z.number(),
+})
+const SavingRegulationSchema = z.object({
+  minWithdrawValue: z.number(),
+  savingTypes: z
+    .array(SavingTypeFormSchema)
+    .refine(
+      (savingTypes) =>
+        savingTypes.filter((type) => type.term === 0).length === 1,
+      {
+        message: "Need regulation for 0 term.",
+      }
+    )
+    .refine(
+      (savingTypes) => {
+        const sortedSavingTypes = savingTypes.sort((a, b) => a.term - b.term)
+
+        for (let i = 1; i < savingTypes.length; i++) {
+          if (
+            sortedSavingTypes[i].interestRate <=
+            sortedSavingTypes[i - 1].interestRate
+          ) {
+            return false
+          }
+        }
+        return true
+      },
+      {
+        message:
+          "For longer terms, the interest rate must be higher than shorter terms.",
+      }
+    ),
+
+  minWithdrawDay: z.number(),
+  isActive: z.boolean(),
+})
+
+export type SavingRegulationFormValues = z.infer<typeof SavingRegulationSchema>
+export type SavingTypeFormValues = z.infer<typeof SavingTypeFormSchema>
+
+const metadata: Metadata<SavingRegulation, SavingRegulationFormValues> = {
+  getUrl: "/regulation",
+  create: {
+    component: (data) => {
+      return <CreateUpdateRegulationModal data={data} />
+    },
+    url: "/regulation",
   },
-  handleResponseData: (data) => {
-    return data
+  update: {
+    component: (data) => {
+      return <CreateUpdateRegulationModal data={data} />
+    },
+    url: "/regulation",
+  },
+  formSchema: zodResolver(SavingRegulationSchema),
+  getDefaultValue: (data) => {
+    return {
+      isActive: data ? data.isActive : true,
+      minWithdrawDay: data ? data.minWithdrawDay : 10,
+      minWithdrawValue: data ? data.minWithdrawValue : 10,
+      savingTypes: data
+        ? data.savingTypes
+        : [{ name: "Zero", interestRate: 0.05, term: 0 }],
+    }
   },
 }
+
 
 const RegulationPage = () => {
   return (

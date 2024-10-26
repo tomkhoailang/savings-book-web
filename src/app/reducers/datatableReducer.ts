@@ -1,5 +1,4 @@
-import { Pagination } from "@nextui-org/pagination"
-import { createSlice } from "@reduxjs/toolkit"
+import {createSlice} from "@reduxjs/toolkit"
 
 const initialState = {
   totalCount: 0,
@@ -26,6 +25,7 @@ const datatableSlice = createSlice({
       state.totalCount = action.payload
     },
     pageChange: (state, action) => {
+      console.log(action);
       state.pagination = action.payload
       state.query = buildQuery(state.pagination)
     },

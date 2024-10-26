@@ -1,45 +1,24 @@
 "use client"
 import moment from "moment"
-import { z } from "zod"
-
-import { useEffect, useState } from "react"
-import { DataTable } from "@/components/common/datatable"
-import {
-  ColumnDef,
-  useReactTable,
-  getCoreRowModel,
-  getPaginationRowModel,
-  getFilteredRowModel,
-} from "@tanstack/react-table"
-import { Checkbox } from "@/components/ui/checkbox"
-import { Check, List, MoreHorizontal } from "lucide-react"
-import { Button } from "@/components/ui/button"
+import {z} from "zod"
+import {DataTable} from "@/components/common/datatable"
+import {ColumnDef,} from "@tanstack/react-table"
+import {Checkbox} from "@/components/ui/checkbox"
+import {Check, List, MoreHorizontal} from "lucide-react"
+import {Button} from "@/components/ui/button"
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import {
-  Table,
-  TableBody,
-  TableCaption,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table"
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip"
-import { CreateUpdateRegulationModal } from "@/components/regulations/CreateUpdateModal"
-import { Metadata } from "@/app/interfaces/metadata"
-import { zodResolver } from "@hookform/resolvers/zod"
+import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow,} from "@/components/ui/table"
+import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger,} from "@/components/ui/tooltip"
+import {CreateUpdateRegulationModal} from "@/components/pages/regulations/CreateUpdateModal"
+import {Metadata} from "@/app/interfaces/metadata"
+import {zodResolver} from "@hookform/resolvers/zod"
+
 export interface SavingType {
   name: string
   term: number

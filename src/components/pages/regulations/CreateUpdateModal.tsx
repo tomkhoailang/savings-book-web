@@ -19,11 +19,11 @@ import {
 
 import { Input } from "@/components/ui/input"
 import { Controller, useForm, useFormContext } from "react-hook-form"
-import TextInput from "../common/InputText"
-import { Checkbox } from "../ui/checkbox"
+import TextInput from "../../common/InputText"
+import { Checkbox } from "../../ui/checkbox"
 import { CircleMinus, PlusCircle } from "lucide-react"
 import { useEffect, useState } from "react"
-import { ScrollArea } from "../ui/scroll-area"
+import { ScrollArea } from "../../ui/scroll-area"
 import proxyService from "@/app/services/proxyService"
 
 export function CreateUpdateRegulationModal({

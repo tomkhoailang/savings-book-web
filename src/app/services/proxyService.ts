@@ -96,19 +96,14 @@ const proxyService = {
     headers: Record<string, string> = {},
     params: Record<string, string> = {}
   ) => {
-    try {
-      const options = buildOptions(headers, params)
-      const fullUrl = `${process.env.NEXT_PUBLIC_API_ENDPOINT}${url}`
+    const options = buildOptions(headers, params)
+    const fullUrl = `${process.env.NEXT_PUBLIC_API_ENDPOINT}${url}`
 
-      const response = await fetch(fullUrl, {
-        method: "DELETE",
-        ...options,
-      })
-      return await handleResponse(response)
-    } catch (e) {
-      console.error("Fetch error", e)
-      throw e
-    }
+    const response = await fetch(fullUrl, {
+      method: "DELETE",
+      ...options,
+    })
+    return response
   },
 }
 

@@ -51,24 +51,8 @@ const registerFormSchema = z
       .regex(/[a-z]/, {
         message: "Password must contain at least one lowercase letter",
       })
-      .regex(/[0-9]/, { message: "Password must contain at least one number" })
-      .regex(/[@$!%*?&#]/, {
-        message: "Password must contain at least one special character",
-      }),
-    confirmPassword: z
-      .string()
-      .min(6, { message: "Password must be at least 3 characters" })
-      .max(20, { message: "Password must be less or equal than 20 characters" })
-      .regex(/[A-Z]/, {
-        message: "Password must contain at least one uppercase letter",
-      })
-      .regex(/[a-z]/, {
-        message: "Password must contain at least one lowercase letter",
-      })
-      .regex(/[0-9]/, { message: "Password must contain at least one number" })
-      .regex(/[@$!%*?&#]/, {
-        message: "Password must contain at least one special character",
-      }),
+      .regex(/[0-9]/, { message: "Password must contain at least one number" }),
+    confirmPassword: z.string(),
   })
   .refine((data) => data.password === data.confirmPassword, {
     path: ["confirmPassword"],
@@ -87,18 +71,6 @@ const loginFormSchema = z.object({
     .min(6, { message: "Password must be at least 6 characters" })
     .max(20, {
       message: "Password must be less or equal than 20 characters",
-    })
-    .regex(/[A-Z]/, {
-      message: "Password must contain at least one uppercase letter",
-    })
-    .regex(/[a-z]/, {
-      message: "Password must contain at least one lowercase letter",
-    })
-    .regex(/[0-9]/, {
-      message: "Password must contain at least one number",
-    })
-    .regex(/[@$!%*?&#]/, {
-      message: "Password must contain at least one special character",
     }),
   rememberPassword: z.boolean().default(false),
 })

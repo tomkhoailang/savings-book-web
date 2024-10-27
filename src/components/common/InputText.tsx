@@ -82,9 +82,10 @@ const TextInput: React.FC<TextInputProps> = ({
                   className={`${componentClassName} ${
                     error ? "border-red-500" : ""
                   }`}
-                  onChange={(e) =>
-                    field.onChange(e.target.value ? Number(e.target.value) : 0)
-                  }
+                  onChange={(e) => {
+                    const value = e.target.value ? Number(e.target.value) : 0
+                    field.onChange(value >= 0 ? value : 0)
+                  }}
                 />
               ) : (
                 <Input

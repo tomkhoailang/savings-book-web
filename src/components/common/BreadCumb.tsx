@@ -1,7 +1,8 @@
 "use client"
 
-import { usePathname } from "next/navigation"
-import { ThemeToggle } from "./ThemeToggle"
+import {usePathname} from "next/navigation"
+import {ThemeToggle} from "./ThemeToggle"
+import Notification from "@/components/common/Notification";
 
 const BreadCumb = () => {
   const pathname = usePathname()
@@ -19,8 +20,10 @@ const BreadCumb = () => {
             )
           })}
         </div>
-        <div className="mr-4">
-          <ThemeToggle />
+        <div className="mr-4 flex flex-row space-x-2 items-center justify-center">
+          <ThemeToggle/>
+          <Notification/>
+
         </div>
       </div>
     </div>

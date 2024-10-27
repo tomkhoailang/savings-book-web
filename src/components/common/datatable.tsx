@@ -113,7 +113,8 @@ export function DataTable<
         title: "Unauthorized",
         description: "You don't have enough permission to access this page",
         duration: 1500,
-        className: "w-2/6 fixed top-8 right-16 bg-red-500 text-white",
+        className: "top-0 right-0 fixed md:max-w-[420px] md:top-4 md:right-4",
+        variant: "destructive",
       })
       return
     }
@@ -142,17 +143,22 @@ export function DataTable<
   }
 
   const handleDelete = async () => {
-    const filteredData = data.filter((item, index) => {
-      return index in rowSelection
-    }).map(item => item.id)
-    const res = await proxyService.delete(`/regulation?ids=${filteredData.join(",")}`)
+    const filteredData = data
+      .filter((item, index) => {
+        return index in rowSelection
+      })
+      .map((item) => item.id)
+    const res = await proxyService.delete(
+      `/regulation?ids=${filteredData.join(",")}`
+    )
 
     if (res.status !== 204) {
       toast({
         title: "Error",
+        variant: "destructive",
         description: "Something went wrong",
         duration: 1500,
-        className: "w-2/6 fixed top-8 right-16 bg-red-500 text-white",
+        className: "top-0 right-0 fixed md:max-w-[420px] md:top-4 md:right-4",
       })
     } else {
       toast({
@@ -161,23 +167,20 @@ export function DataTable<
         duration: 1500,
         className: "w-1/4 fixed top-8 right-16 bg-green-500 text-white",
       })
-
-      const newData = data.filter((item) => {
-        return item.id != null && !filteredData.includes(item.id)
-      })
       const newLength = data.length - filteredData.length
-
       if (newLength === 0 && datatableReducer.pagination.current > 1) {
-        dispatch(pageChange({current: datatableReducer.pagination.current - 1, size: datatableReducer.pagination.size}))
+        dispatch(
+          pageChange({
+            current: datatableReducer.pagination.current - 1,
+            size: datatableReducer.pagination.size,
+          })
+        )
       } else {
         fetchData(metadata.getUrl + datatableReducer.query)
-
       }
       setRowSelection({})
       setIsDeleteModalOpen(false)
-
     }
-
   }
 
   useEffect(() => {

@@ -53,8 +53,9 @@ export default function UpdateModal<
         toast({
           title: "Error",
           description: content.error,
+          variant: "destructive",
           duration: 1500,
-          className: "w-1/6 fixed top-8 right-16 bg-red-500 text-white",
+          className: "top-0 right-0 fixed md:max-w-[420px] md:top-4 md:right-4",
         })
       } else {
         toast({

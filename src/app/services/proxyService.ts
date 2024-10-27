@@ -42,7 +42,6 @@ const proxyService = {
     const fullUrl = `${process.env.NEXT_PUBLIC_API_ENDPOINT}${url}${
       queryString ? `?${queryString}` : ""
     }`
-    console.log(options)
     const response = await fetch(fullUrl, options)
     return response
   },

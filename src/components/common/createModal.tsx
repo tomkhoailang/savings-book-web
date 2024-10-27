@@ -41,10 +41,12 @@ export default function CreateModal<
 
         if (!res.ok) {
             toast({
-                title: "Error",
-                description: content.error,
-                duration: 1500,
-                className: "w-2/6 fixed top-8 right-16 bg-red-500 text-white",
+              title: "Error",
+              variant: "destructive",
+              description: content.error,
+              duration: 1500,
+              className:
+                "top-0 right-0 fixed md:max-w-[420px] md:top-4 md:right-4",
             })
         } else {
             toast({

@@ -143,16 +143,19 @@ const Login = () => {
     if (!res.ok) {
       toast({
         title: "Error",
+        variant: "destructive",
         description: content.error,
         duration: 1500,
-        className: "w-1/6 fixed top-8 right-16 bg-red-500 text-white",
+        className:
+          "top-0 right-0 fixed md:max-w-[420px] md:top-4 md:right-4",
       })
     } else {
       toast({
         title: "Sign up complete",
+        variant: "default",
         description: "Your account is created successfully",
         duration: 1500,
-        className: "w-1/4 fixed top-8 right-16 bg-green-500 text-white",
+        className: "top-0 right-0 fixed md:max-w-[420px] md:top-4 md:right-4 bg-green-600 text-white",
       })
       setActiveTab("login")
       registerForm.reset()
@@ -171,9 +174,10 @@ const Login = () => {
       const errorContent = content as ErrorResponse
       toast({
         title: "Error",
+        variant: "destructive",
         description: errorContent.error,
         duration: 1500,
-        className: "w-1/6 fixed top-8 right-16 bg-red-500 text-white",
+        className: "top-0 right-0 fixed md:max-w-[420px] md:top-4 md:right-4",
       })
     } else {
       const loginContent = content as LoginResponse

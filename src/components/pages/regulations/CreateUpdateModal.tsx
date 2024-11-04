@@ -82,7 +82,12 @@ export function CreateUpdateRegulationModal({
         return id === index
           ? {
               ...type,
-              [field]: field === "name" ? value : parseFloat(value) || 0,
+              [field]:
+                field === "name"
+                  ? value
+                  : parseFloat(value) >= 0
+                  ? parseFloat(value)
+                  : 0,
             }
           : type
       })

@@ -167,7 +167,7 @@ const SavingRegulationSchema = z.object({
       (savingTypes) =>
         savingTypes.filter((type) => type.term === 0).length === 1,
       {
-        message: "Need regulation for 0 term.",
+        message: "Need regulation for only 0 term.",
       }
     )
     .refine(

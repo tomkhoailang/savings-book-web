@@ -43,21 +43,27 @@ const registerFormSchema = z
       .email("Email is not valid"),
     password: z
       .string()
-      .min(6, { message: "Password must be at least 3 characters" })
+      .min(6, { message: "Password must be at least 6 characters" })
       .max(20, { message: "Password must be less or equal than 20 characters" })
       .regex(/[A-Z]/, {
         message: "Password must contain at least one uppercase letter",
       })
       .regex(/[a-z]/, {
         message: "Password must contain at least one lowercase letter",
-      })
-      .regex(/[0-9]/, { message: "Password must contain at least one number" }),
+      }),
     confirmPassword: z.string(),
   })
   .refine((data) => data.password === data.confirmPassword, {
     path: ["confirmPassword"],
     message: "Confirm password doesn't match the provided password",
   })
+
+const sendResetPasswordSchema = z.object({
+  email: z
+    .string()
+    .min(1, { message: "Email can't be empty" })
+    .email("Email is not valid"),
+})
 
 const loginFormSchema = z.object({
   username: z
@@ -77,17 +83,15 @@ const loginFormSchema = z.object({
 
 type RegisterFormValues = z.infer<typeof registerFormSchema>
 type LoginFormValues = z.infer<typeof loginFormSchema>
+type SendResetPasswordValues = z.infer<typeof sendResetPasswordSchema>
 
 const Login = () => {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
   const [activeTab, setActiveTab] = useState("login")
+  const [isReset, setIsReset] = useState(false)
   const { toast } = useToast()
   const authContext = useAuth()
-
-  const handleTabChange = (tab: string) => {
-    setActiveTab(tab)
-  }
 
   const registerForm = useForm<RegisterFormValues>({
     resolver: zodResolver(registerFormSchema),
@@ -106,6 +110,40 @@ const Login = () => {
       rememberPassword: false,
     },
   })
+  const resetPasswordForm = useForm<SendResetPasswordValues>({
+    resolver: zodResolver(sendResetPasswordSchema),
+    defaultValues: {
+      email: "",
+    },
+  })
+  const onResetPasswordForm = async (values: SendResetPasswordValues) => {
+    setLoading(true)
+
+    const res = await proxyService.post("/auth/reset-password", values)
+    const content: ErrorResponse = await res.json()
+
+    if (!res.ok) {
+      toast({
+        title: "Error",
+        variant: "destructive",
+        description: content.error,
+        duration: 1500,
+        className: "top-0 right-0 fixed md:max-w-[420px] md:top-4 md:right-4",
+      })
+    } else {
+      toast({
+        title: "Success",
+        variant: "default",
+        description: "An email is sent to your register mail",
+        duration: 1500,
+        className:
+          "top-0 right-0 fixed md:max-w-[420px] md:top-4 md:right-4 bg-green-600 text-white",
+      })
+      registerForm.reset()
+    }
+    setLoading(false)
+  }
+
   const onRegisterFormSubmit = async (values: RegisterFormValues) => {
     setLoading(true)
 
@@ -118,8 +156,7 @@ const Login = () => {
         variant: "destructive",
         description: content.error,
         duration: 1500,
-        className:
-          "top-0 right-0 fixed md:max-w-[420px] md:top-4 md:right-4",
+        className: "top-0 right-0 fixed md:max-w-[420px] md:top-4 md:right-4",
       })
     } else {
       toast({
@@ -127,7 +164,8 @@ const Login = () => {
         variant: "default",
         description: "Your account is created successfully",
         duration: 1500,
-        className: "top-0 right-0 fixed md:max-w-[420px] md:top-4 md:right-4 bg-green-600 text-white",
+        className:
+          "top-0 right-0 fixed md:max-w-[420px] md:top-4 md:right-4 bg-green-600 text-white",
       })
       setActiveTab("login")
       registerForm.reset()
@@ -175,94 +213,32 @@ const Login = () => {
           height={275}
           className="rounded-lg "
         />
-        <Tabs
-          value={activeTab}
-          onValueChange={setActiveTab}
-          className="w-[275px] mt-2"
-        >
-          <TabsList className="grid grid-cols-2">
-            <TabsTrigger value="login">Login</TabsTrigger>
-            <TabsTrigger value="register">Register</TabsTrigger>
-          </TabsList>
-          <TabsContent value="login">
-            <Card className="w-full border-2 rounded-lg mt-3">
-              <CardContent className="space-y-2 p-0 m-4">
-                <form onSubmit={loginForm.handleSubmit(onLoginFormSubmit)}>
-                  <div className="space-y-1">
-                    <TextInput
-                      control={loginForm.control}
-                      name="username"
-                      label="Username/Email"
-                      placeholder="Username/Email"
-                      className="mb-2"
-                    />
-                  </div>
-                  <div className="space-y-1">
-                    <TextInput
-                      control={loginForm.control}
-                      name="password"
-                      label="Password"
-                      placeholder="Password"
-                      className="mb-2"
-                      password
-                    />
-                  </div>
-                  <div className="flex items-center space-x-2 mt-2">
-                    <Controller
-                      control={loginForm.control}
-                      name="rememberPassword"
-                      render={({ field, fieldState }) => {
-                        return (
-                          <Checkbox
-                            id="rememberPassword"
-                            checked={field.value}
-                            onCheckedChange={field.onChange}
-                          ></Checkbox>
-                        )
-                      }}
-                    />
-                    <Label htmlFor="terms">Remember password?</Label>
-                  </div>
-                  <div className="flex justify-end">
-                    <Button type="submit" className="mt-2">
-                      Login
-                    </Button>
-                  </div>
-                </form>
-              </CardContent>
-            </Card>
-          </TabsContent>
-          <TabsContent
-            value="register"
-            className="border-2 rounded-lg shadow-md "
+        {!isReset ? (
+          <Tabs
+            value={activeTab}
+            onValueChange={setActiveTab}
+            className="w-[275px] mt-2"
           >
-            <ScrollArea className="h-[250px]  ">
-              <Form {...registerForm}>
-                <form
-                  onSubmit={registerForm.handleSubmit(onRegisterFormSubmit)}
-                >
-                  <div className="m-4">
+            <TabsList className="grid grid-cols-2">
+              <TabsTrigger value="login">Login</TabsTrigger>
+              <TabsTrigger value="register">Register</TabsTrigger>
+            </TabsList>
+            <TabsContent value="login">
+              <Card className="w-full border-2 rounded-lg mt-3">
+                <CardContent className="space-y-2 p-0 m-4">
+                  <form onSubmit={loginForm.handleSubmit(onLoginFormSubmit)}>
                     <div className="space-y-1">
                       <TextInput
-                        control={registerForm.control}
+                        control={loginForm.control}
                         name="username"
-                        label="Username"
-                        placeholder="Username"
+                        label="Username/Email"
+                        placeholder="Username/Email"
                         className="mb-2"
                       />
                     </div>
                     <div className="space-y-1">
                       <TextInput
-                        control={registerForm.control}
-                        name="email"
-                        label="Email"
-                        placeholder="Email"
-                        className="mb-2"
-                      />
-                    </div>
-                    <div className="space-y-1">
-                      <TextInput
-                        control={registerForm.control}
+                        control={loginForm.control}
                         name="password"
                         label="Password"
                         placeholder="Password"
@@ -270,28 +246,134 @@ const Login = () => {
                         password
                       />
                     </div>
-                    <div className="space-y-1">
-                      <TextInput
-                        control={registerForm.control}
-                        name="confirmPassword"
-                        label="Confirm password"
-                        placeholder="Confirm password"
-                        className="mb-2"
-                        password
+                    <div className="flex items-center space-x-2 mt-2">
+                      <Controller
+                        control={loginForm.control}
+                        name="rememberPassword"
+                        render={({ field, fieldState }) => {
+                          return (
+                            <Checkbox
+                              id="rememberPassword"
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                            ></Checkbox>
+                          )
+                        }}
                       />
+                      <Label htmlFor="terms">Remember password</Label>
+                    </div>
+                    <div
+                      className="mt-2 text-sm text-gray-400 hover:text-blue-400 cursor-pointer"
+                      onClick={() => {
+                        setIsReset(true)
+                      }}
+                    >
+                      Forgot your password?
                     </div>
                     <div className="flex justify-end">
                       <LoadingButton
                         isLoading={loading}
-                        label="Register"
+                        label="Login"
                       ></LoadingButton>
                     </div>
-                  </div>
-                </form>
-              </Form>
-            </ScrollArea>
-          </TabsContent>
-        </Tabs>
+                  </form>
+                </CardContent>
+              </Card>
+            </TabsContent>
+            <TabsContent
+              value="register"
+              className="border-2 rounded-lg shadow-md "
+            >
+              <ScrollArea className="h-[325px]  ">
+                <Form {...registerForm}>
+                  <form
+                    onSubmit={registerForm.handleSubmit(onRegisterFormSubmit)}
+                  >
+                    <div className="m-4">
+                      <div className="space-y-1">
+                        <TextInput
+                          control={registerForm.control}
+                          name="username"
+                          label="Username"
+                          placeholder="Username"
+                          className="mb-2"
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <TextInput
+                          control={registerForm.control}
+                          name="email"
+                          label="Email"
+                          placeholder="Email"
+                          className="mb-2"
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <TextInput
+                          control={registerForm.control}
+                          name="password"
+                          label="Password"
+                          placeholder="Password"
+                          className="mb-2"
+                          password
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <TextInput
+                          control={registerForm.control}
+                          name="confirmPassword"
+                          label="Confirm password"
+                          placeholder="Confirm password"
+                          className="mb-2"
+                          password
+                        />
+                      </div>
+                      <div className="flex justify-end">
+                        <LoadingButton
+                          isLoading={loading}
+                          label="Register"
+                        ></LoadingButton>
+                      </div>
+                    </div>
+                  </form>
+                </Form>
+              </ScrollArea>
+            </TabsContent>
+          </Tabs>
+        ) : (
+          <Card className="w-full border-2 rounded-lg mt-3">
+            <CardContent className="space-y-2 p-0 m-4">
+              <form
+                onSubmit={resetPasswordForm.handleSubmit(onResetPasswordForm)}
+              >
+                <div className="space-y-1">
+                  <TextInput
+                    control={resetPasswordForm.control}
+                    name="email"
+                    label="Email"
+                    placeholder="Email"
+                    className="mb-2"
+                  />
+                </div>
+
+                <div
+                  className="mt-2 text-sm text-gray-400 hover:text-blue-400 cursor-pointer"
+                  onClick={() => {
+                    setIsReset(false)
+                  }}
+                >
+                  Login?
+                </div>
+                <div className="flex justify-end">
+                  <LoadingButton
+                    isLoading={loading}
+                    label="Send email"
+                  ></LoadingButton>
+                </div>
+              </form>
+            </CardContent>
+          </Card>
+        )}
       </Card>
     </div>
   )

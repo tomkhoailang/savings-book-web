@@ -1,8 +1,13 @@
 "use client"
-import React, {useEffect} from "react"
-import {Button} from "@/components/ui/button"
+import React, { useEffect } from "react"
+import { Button } from "@/components/ui/button"
 
-import {ChevronLeftIcon, ChevronRightIcon, DoubleArrowLeftIcon, DoubleArrowRightIcon,} from "@radix-ui/react-icons"
+import {
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  DoubleArrowLeftIcon,
+  DoubleArrowRightIcon,
+} from "@radix-ui/react-icons"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -20,21 +25,41 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue,} from "@/components/ui/select"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 
-import {ColumnDef, flexRender, getCoreRowModel, getPaginationRowModel, Row, useReactTable,} from "@tanstack/react-table"
-import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow,} from "@/components/ui/table"
+import {
+  ColumnDef,
+  flexRender,
+  getCoreRowModel,
+  getPaginationRowModel,
+  Row,
+  useReactTable,
+} from "@tanstack/react-table"
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table"
 import proxyService from "@/app/services/proxyService"
-import {useRouter} from "next/navigation"
-import {useToast} from "@/hooks/use-toast"
-import {useDispatch, useSelector} from "react-redux"
-import {RootState} from "@/app/reducers/store"
-import {pageChange, updateTotalRow} from "@/app/reducers/datatableReducer"
+import { useRouter } from "next/navigation"
+import { useToast } from "@/hooks/use-toast"
+import { useDispatch, useSelector } from "react-redux"
+import { RootState } from "@/app/reducers/store"
+import { pageChange, updateTotalRow } from "@/app/reducers/datatableReducer"
 import UpdateModal from "./updateModal"
-import {MoreHorizontal} from "lucide-react"
-import {Metadata} from "@/app/interfaces/metadata"
-import {FieldValues} from "react-hook-form"
-import {Badge} from "../ui/badge"
+import { MoreHorizontal } from "lucide-react"
+import { Metadata } from "@/app/interfaces/metadata"
+import { FieldValues } from "react-hook-form"
+import { Badge } from "../ui/badge"
 import CreateModal from "./createModal"
 
 interface DataTableProps<
@@ -46,17 +71,15 @@ interface DataTableProps<
   metadata: Metadata<TData, TFormValues>
 }
 
-
 export function DataTable<
   TData extends AuditedEntity,
   TValue,
   TFormValues extends FieldValues
->({columns, metadata}: DataTableProps<TData, TValue, TFormValues>) {
+>({ columns, metadata }: DataTableProps<TData, TValue, TFormValues>) {
   const dispatch = useDispatch()
   const datatableReducer = useSelector(
     (state: RootState) => state.datatableReducer
   )
-
 
   const [rowSelection, setRowSelection] = React.useState({})
   const [selectedRowForUpdate, setSelectedRowForUpdate] =
@@ -64,19 +87,20 @@ export function DataTable<
   const [isUpdateModalOpen, setIsUpdateModalOpen] = React.useState(false)
   const [isCreateModalOpen, setIsCreateModalOpen] = React.useState(false)
   const [isDeleteModalOpen, setIsDeleteModalOpen] = React.useState(false)
+  const [isDisableModalOpen, setIsDisableModalOpen] = React.useState(false)
 
   const updatedColumns: ColumnDef<TData, TValue>[] = columns.map((column) => {
     if (column.id === "actions") {
       return {
         ...column,
-        cell: ({row}: { row: Row<TData> }) => {
+        cell: ({ row }: { row: Row<TData> }) => {
           const regulation = row.original
           return (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="h-8 w-8 p-0">
                   <span className="sr-only">Open menu</span>
-                  <MoreHorizontal className="h-4 w-4"/>
+                  <MoreHorizontal className="h-4 w-4" />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
@@ -96,6 +120,36 @@ export function DataTable<
         },
       }
     }
+    if (column.id === "disable") {
+      return {
+        ...column,
+        cell: ({ row }: { row: Row<TData> }) => {
+          const regulation = row.original
+          return (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="h-8 w-8 p-0">
+                  <span className="sr-only">Open menu</span>
+                  <MoreHorizontal className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                <DropdownMenuItem
+                  onClick={() => {
+                    // setSelectedRowForUpdate(regulation as TData)
+                    disableUser(regulation as TData)
+                    console.log("test")
+                  }}
+                >
+                  {regulation.isActive === true ? "Block User" : "Active User"}
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )
+        },
+      }
+    }
     return column
   })
 
@@ -103,9 +157,10 @@ export function DataTable<
   const [data, setData] = React.useState<TData[]>([])
   const [totalCount, setTotalCount] = React.useState(0)
   const router = useRouter()
-  const {toast} = useToast()
+  const { toast } = useToast()
 
   const fetchData = async (url: string) => {
+    console.log(url)
     const res = await proxyService.get(url)
     if (res.status == 401) {
       router.push("/login")
@@ -125,6 +180,34 @@ export function DataTable<
       setData((content.items as TData[]) ?? [])
       setTotalCount(content.totalCount)
       dispatch(updateTotalRow(content.totalCount))
+    }
+  }
+
+  const disableUser = async (data: TData) => {
+    const filteredData = data?.id
+    console.log(filteredData)
+    const res = await proxyService.put(
+      `${metadata.getUrl}/disable/${filteredData}`,
+      {}
+    )
+
+    if (res.status !== 200) {
+      toast({
+        title: "Error",
+        variant: "destructive",
+        description: "Something went wrong",
+        duration: 1500,
+        className: "top-0 right-0 fixed md:max-w-[420px] md:top-4 md:right-4",
+      })
+    } else {
+      toast({
+        title: "Successfully",
+        description: "Change status user completely",
+        duration: 1500,
+        className: "w-1/4 fixed top-8 right-16 bg-green-500 text-white",
+      })
+      setRowSelection({})
+      fetchData(metadata.getUrl)
     }
   }
   const whenUpdateClose = (resData: TData) => {
@@ -149,7 +232,7 @@ export function DataTable<
       })
       .map((item) => item.id)
     const res = await proxyService.delete(
-      `/regulation?ids=${filteredData.join(",")}`
+      `${metadata.getUrl}?ids=${filteredData.join(",")}`
     )
 
     if (res.status !== 204) {
@@ -197,7 +280,6 @@ export function DataTable<
     setPageSize(datatableReducer.pagination.size)
   }, [datatableReducer.pagination.size])
 
-
   const table = useReactTable({
     data,
     columns: updatedColumns,
@@ -214,8 +296,8 @@ export function DataTable<
   }, [])
 
   const onPage = (current: number, size: number) => {
-    console.log(current);
-    dispatch(pageChange({current, size}))
+    console.log(current)
+    dispatch(pageChange({ current, size }))
     setRowSelection({})
   }
 
@@ -236,14 +318,19 @@ export function DataTable<
           </Badge>
         </div>
         <div className="space-x-5 flex flex-row justify-center">
-          <Button
-            className="bg-green-600 rounded-lg"
-            onClick={() => {
-              setIsCreateModalOpen(true)
-            }}
-          >
-            Create
-          </Button>
+          {metadata.getUrl !== "/user" ? (
+            <Button
+              className="bg-green-600 rounded-lg"
+              id="btn-create"
+              onClick={() => {
+                setIsCreateModalOpen(true)
+              }}
+            >
+              Create
+            </Button>
+          ) : (
+            ""
+          )}
           <AlertDialog open={isDeleteModalOpen}>
             <Button
               className="bg-red-500 rounded-lg"
@@ -292,9 +379,9 @@ export function DataTable<
                     {header.isPlaceholder
                       ? null
                       : flexRender(
-                        header.column.columnDef.header,
-                        header.getContext()
-                      )}
+                          header.column.columnDef.header,
+                          header.getContext()
+                        )}
                   </TableHead>
                 ))}
               </TableRow>
@@ -332,8 +419,8 @@ export function DataTable<
       </div>
       <div className="flex items-center justify-between px-2 mt-2">
         <div className="flex-1 text-sm text-muted-foreground">
-          {table.getFilteredSelectedRowModel().rows.length} of {data.length > pageSize ? pageSize : data.length}{" "}
-          row(s) selected.
+          {table.getFilteredSelectedRowModel().rows.length} of{" "}
+          {data.length > pageSize ? pageSize : data.length} row(s) selected.
         </div>
         <div className="flex items-center space-x-6 lg:space-x-8">
           <div className="flex items-center space-x-2">
@@ -342,7 +429,7 @@ export function DataTable<
               value={`${pageSize}`}
               onValueChange={(value) => {
                 table.setPageSize(Number(value))
-                dispatch(pageChange({current: 1, size: Number(value)}))
+                dispatch(pageChange({ current: 1, size: Number(value) }))
               }}
             >
               <SelectTrigger className="h-8 w-[70px]">
@@ -373,7 +460,7 @@ export function DataTable<
               disabled={datatableReducer.pagination.current <= 1}
             >
               <span className="sr-only">Go to first page</span>
-              <DoubleArrowLeftIcon className="h-4 w-4"/>
+              <DoubleArrowLeftIcon className="h-4 w-4" />
             </Button>
             <Button
               variant="outline"
@@ -384,31 +471,31 @@ export function DataTable<
               disabled={datatableReducer.pagination.current <= 1}
             >
               <span className="sr-only">Go to previous page</span>
-              <ChevronLeftIcon className="h-4 w-4"/>
+              <ChevronLeftIcon className="h-4 w-4" />
             </Button>
             <Button
               variant="outline"
               className="h-8 w-8 p-0"
               onClick={() => {
-                console.log(datatableReducer.pagination.current + 1);
+                console.log(datatableReducer.pagination.current + 1)
                 onPage(datatableReducer.pagination.current + 1, pageSize)
-              }
-              }
+              }}
               disabled={
                 datatableReducer.pagination.current >=
                 Math.ceil(totalCount / table.getState().pagination.pageSize)
               }
             >
               <span className="sr-only">Go to next page</span>
-              <ChevronRightIcon className="h-4 w-4"/>
+              <ChevronRightIcon className="h-4 w-4" />
             </Button>
             <Button
               variant="outline"
               className="hidden h-8 w-8 p-0 lg:flex"
               onClick={() => {
-                onPage(Math.ceil(
-                  totalCount / table.getState().pagination.pageSize
-                ), pageSize)
+                onPage(
+                  Math.ceil(totalCount / table.getState().pagination.pageSize),
+                  pageSize
+                )
               }}
               disabled={
                 datatableReducer.pagination.current >=
@@ -416,7 +503,7 @@ export function DataTable<
               }
             >
               <span className="sr-only">Go to last page</span>
-              <DoubleArrowRightIcon className="h-4 w-4"/>
+              <DoubleArrowRightIcon className="h-4 w-4" />
             </Button>
           </div>
         </div>

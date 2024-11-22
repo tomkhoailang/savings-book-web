@@ -25,8 +25,6 @@ interface TextInputProps {
   required?: boolean
   inline?: boolean
   number?: boolean
-  readonly?: boolean
-  disabled?: boolean
 }
 
 const TextInput: React.FC<TextInputProps> = ({
@@ -41,8 +39,6 @@ const TextInput: React.FC<TextInputProps> = ({
   password = false,
   icon,
   maxlength,
-  disabled,
-  readonly,
   required,
   inline = false,
   number = false,
@@ -112,5 +108,6 @@ const TextInput: React.FC<TextInputProps> = ({
     />
   )
 }
+
 
 export default TextInput

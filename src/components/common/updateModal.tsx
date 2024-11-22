@@ -46,10 +46,7 @@ export default function UpdateModal<
 
   const onSubmit = async (data: TFormValues) => {
     if (dataSource) {
-      const res = await proxyService.put(
-        `${metadata.getUrl}/${dataSource.id}`,
-        data
-      )
+      const res = await proxyService.put(`/regulation/${dataSource.id}`, data)
       const content = await res.json()
 
       if (!res.ok) {

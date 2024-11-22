@@ -78,10 +78,7 @@ const SideBarLayout = () => {
             </div>
             <div className="parent-group  p-3 border-b-2 space-y-2  ">
               <div className="text-xs mb-2">Sổ tiết kiệm </div>
-              <div
-                className="text-sm flex flex-row space-x-2 items-center cursor-pointer"
-                onClick={() => onSidebarItemClick("/savings-book")}
-              >
+              <div className="text-sm flex flex-row space-x-2 items-center">
                 <BedSingle size={20} className="text-xs" />
                 <div>Mở sổ</div>
               </div>
@@ -115,12 +112,9 @@ const SideBarLayout = () => {
             <div className="parent-group  p-3 border-b-2 space-y-2 ">
               <div className="text-xs mb-2">Hệ thống</div>
 
-              <div
-                className="text-sm flex flex-row space-x-2 items-center cursor-pointer"
-                onClick={() => onSidebarItemClick("/user-manager/users")}
-              >
+              <div className="text-sm flex flex-row space-x-2 items-center">
                 <BedSingle size={20} className="text-xs" />
-                <div>Users</div>
+                <div>User</div>
               </div>
               <div className="text-sm flex flex-row space-x-2 items-center">
                 <BedSingle size={20} className="text-xs" />

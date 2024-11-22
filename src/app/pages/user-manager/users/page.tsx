@@ -1,177 +1,156 @@
 "use client"
-import moment from "moment"
-import { z } from "zod"
-import { DataTable } from "@/components/common/datatable"
-import { ColumnDef } from "@tanstack/react-table"
-import { Checkbox } from "@/components/ui/checkbox"
-import { Check, List, MoreHorizontal } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table"
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip"
-// import { CreateUpdateUserModal } from "@/components/pages/saving-book/CreateModal"
-import { Metadata } from "@/app/interfaces/metadata"
-import { zodResolver } from "@hookform/resolvers/zod"
-import Address from "@/app/interfaces/address"
-import { DetailUserModal } from "@/components/pages/user-manager/DetailModal"
 
-export interface User extends AuditedEntity {
-  id: string
-  username: string
-  email: string
-  CreatorName: string
-  lastModifierName: string
-  nextSchedule: Date
-  isActive: boolean
-  isDelete: boolean
-}
+import React, { useState } from "react";
+import {Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Pagination, getKeyValue} from "@nextui-org/react";
 
-const columns: ColumnDef<User>[] = [
+
+
+const rows = [
   {
-    id: "select",
-    header: ({ table }) => (
-      <Checkbox
-        checked={
-          table.getIsAllPageRowsSelected() ||
-          (table.getIsSomePageRowsSelected() && "indeterminate")
-        }
-        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-        aria-label="Select all"
-      />
-    ),
-    cell: ({ row }) => (
-      <Checkbox
-        checked={row.getIsSelected()}
-        onCheckedChange={(value) => row.toggleSelected(!!value)}
-        aria-label="Select row"
-      />
-    ),
-    enableSorting: false,
-    enableHiding: false,
+    key: "1",
+    username: "user1",
+    name: "Tony Reichert",
+    idnumber: "123456754321",
+    email: "user1@gmail.com",
   },
   {
-    accessorKey: "lastModifierName",
-    header: "Name",
+    key: "2",
+    username: "user2",
+    name: "Mark Hummer",
+    idnumber: "840937227483",
+    email: "user2@gmail.com",
   },
   {
-    accessorKey: "username",
-    header: "Username",
+    key: "3",
+    username: "user3",
+    name: "David Tom",
+    idnumber: "537826382644",
+    email: "user3@gmail.com",
   },
   {
-    accessorKey: "email",
-    header: "Email",
+    key: "4",
+    username: "user4",
+    name: "Chris Smith",
+    idnumber: "352678677390",
+    email: "user4@gmail.com",
+  },
+];
+
+const columns = [
+  {
+    key: "username",
+    label: "USERNAME",
   },
   {
-    accessorKey: "creationTime",
-    header: "Creation Time",
-    cell: ({ row }) => {
-      const User = row.original
-
-      return moment(User.creationTime).format("DD/MM/YYYY HH:mm:ss")
-    },
+    key: "name",
+    label: "NAME",
   },
   {
-    accessorKey: "lastModificationTime",
-    cell: ({ row }) => {
-      const User = row.original
-
-      if (new Date(User.lastModificationTime).getFullYear() === 1) {
-        return ""
-      }
-      return moment(User.lastModificationTime).format("DD/MM/YYYY HH:mm:ss")
-    },
-    header: "Last Modification Time",
+    key: "idnumber",
+    label: "ID CARD NUMBER",
   },
   {
-    accessorKey: "isActive",
-    cell: ({ row }) => {
-      const User = row.original
-
-      if (User.isActive === true) {
-        return "Active"
-      }
-      return "Block"
-    },
-    header: "Status",
+    key: "email",
+    label: "EMAIL",
   },
   {
-    id: "disable",
-    // cell: ({ row }) => {
-    //   return (
-    //     <DropdownMenu>
-    //       <DropdownMenuTrigger asChild>
-    //         <Button variant="ghost" className="h-8 w-8 p-0">
-    //           <span className="sr-only">Open menu</span>
-    //           <MoreHorizontal className="h-4 w-4" />
-    //         </Button>
-    //       </DropdownMenuTrigger>
-    //       <DropdownMenuContent align="end">
-    //         <DropdownMenuLabel>Actions</DropdownMenuLabel>
-    //         <DropdownMenuItem>Edit</DropdownMenuItem>
-    //       </DropdownMenuContent>
-    //     </DropdownMenu>
-    //   )
-    // },
+    key: "setting",
+    label: "",
   },
-]
+];
 
-const UserSchema = z.object({
-  CreatorName: z.string().min(1, { message: "Name can't be empty." }),
-  isActive: z.boolean(),
-})
+export default function App() {
+  const [hover, setHover] = useState(false);
 
-export type UserFormValues = z.infer<typeof UserSchema>
-const metadata: Metadata<User, UserFormValues> = {
-  getUrl: "/user",
-  create: {
-    component: (data) => {
-      return <DetailUserModal data={data} />
-    },
-    url: "/user",
-  },
-  update: {
-    component: (data) => {
-      return <DetailUserModal data={data} />
-    },
-    url: "/user",
-  },
-  formSchema: zodResolver(UserSchema),
-  getDefaultValue: (data) => {
-    return {
-      username: data ? data.username : "",
-      email: data ? data.email : "",
-      CreatorName: data ? data.CreatorName : "",
-      lastModifierName: data ? data.lastModificationTime : "",
-      nextSchedule: data ? data.nextSchedule : true,
-      isActive: data ? data.isActive : true,
-    }
-  },
-}
+  const buttonStyle = {
+    backgroundColor: hover ? "#FFFFFF" : "transparent",
+    border: "none",
+    cursor: "pointer",
+    padding: "5px",
+    borderRadius: "5px",
+  };
+  
+  const [page, setPage] = React.useState(1);
+  const rowsPerPage = 4;
 
-const SavingsBookPage = () => {
+  const pages = Math.ceil(rows.length / rowsPerPage);
+
+  const items = React.useMemo(() => {
+    const start = (page - 1) * rowsPerPage;
+    const end = start + rowsPerPage;
+
+    return rows.slice(start, end);
+  }, [page, rows]);
+
   return (
-    <div className="container mx-auto py-10">
-      <DataTable columns={columns} metadata={metadata} />
-    </div>
-  )
+    <Table 
+      aria-label="Example table with client side pagination"
+      bottomContent={
+        <div className="flex w-full justify-center">
+          <Pagination
+            isCompact
+            showControls
+            showShadow
+            color="secondary"
+            page={page}
+            total={pages}
+            onChange={(page) => setPage(page)}
+          />
+        </div>}
+         classNames={{
+          wrapper: "min-h-[222px]",
+        }}>
+      
+      <TableHeader columns={columns}>
+        {(column) => <TableColumn key={column.key}>{column.label}</TableColumn>}
+      </TableHeader>
+      <TableBody items={items}>
+        {(item) => (
+         <TableRow key={item.key}>
+         {(columnKey) =>
+           columnKey === "setting" ? (
+             <TableCell style={{ textAlign: "center" }}>
+              <button 
+                style={buttonStyle}
+                onMouseEnter={() => setHover(true)}
+                onMouseLeave={() => setHover(false)}
+                >
+                <img 
+                  src="https://img.icons8.com/ios-glyphs/30/FFFFFF/visible.png"
+                  alt="view"
+                  style={{ width: "20px", height: "20px"}}/>
+               </button>
+               <button
+                style={buttonStyle}
+                onMouseEnter={() => setHover(true)}
+                onMouseLeave={() => setHover(false)}
+                >
+                <img 
+                  src="https://img.icons8.com/ios-glyphs/30/FFFFFF/edit.png"
+                  alt="edit"
+                  style={{ width: "20px", height: "20px"}}/>
+               </button>
+               <button
+                style={buttonStyle}
+                onMouseEnter={() => setHover(true)}
+                onMouseLeave={() => setHover(false)}
+                >
+                <img
+                  src="https://img.icons8.com/ios-glyphs/30/FFFFFF/trash.png"
+                  alt="edit"
+                  style={{ width: "20px", height: "20px"}}/>
+                  
+               </button>
+             </TableCell>
+           ) : (
+             <TableCell style={{ textAlign: "center" }}>{getKeyValue(item, columnKey)}</TableCell>
+           )
+         }
+       </TableRow>
+        )}
+      </TableBody>
+    </Table>
+  );
 }
 
-export default SavingsBookPage
+

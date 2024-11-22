@@ -1,7 +1,6 @@
 "use client"
 import moment from "moment"
-import {z} from "zod"
-import {DataTable} from "@/components/common/datatable"
+import { z } from "zod"
 import {ColumnDef,} from "@tanstack/react-table"
 import {Checkbox} from "@/components/ui/checkbox"
 import {Check, List, MoreHorizontal} from "lucide-react"
@@ -15,9 +14,10 @@ import {
 } from "@/components/ui/dropdown-menu"
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow,} from "@/components/ui/table"
 import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger,} from "@/components/ui/tooltip"
-import {CreateUpdateRegulationModal} from "@/components/pages/regulations/CreateUpdateModal"
+import {CreateUpdateRegulationModal} from "@/components/pages/regulations/CreateUpdateRegulationModal"
 import {Metadata} from "@/app/interfaces/metadata"
 import {zodResolver} from "@hookform/resolvers/zod"
+import { DataTable } from "@/components/common/datatable/Datatable"
 
 export interface SavingType {
   name: string
@@ -33,28 +33,6 @@ export interface SavingRegulation extends AuditedEntity {
 }
 
 const columns: ColumnDef<SavingRegulation>[] = [
-  {
-    id: "select",
-    header: ({ table }) => (
-      <Checkbox
-        checked={
-          table.getIsAllPageRowsSelected() ||
-          (table.getIsSomePageRowsSelected() && "indeterminate")
-        }
-        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-        aria-label="Select all"
-      />
-    ),
-    cell: ({ row }) => (
-      <Checkbox
-        checked={row.getIsSelected()}
-        onCheckedChange={(value) => row.toggleSelected(!!value)}
-        aria-label="Select row"
-      />
-    ),
-    enableSorting: false,
-    enableHiding: false,
-  },
   {
     accessorKey: "minWithdrawDay",
     header: "Min Withdraw Day",
@@ -132,26 +110,7 @@ const columns: ColumnDef<SavingRegulation>[] = [
       )
     },
     header: "Last Modification Time",
-  },
-  {
-    id: "actions",
-    cell: ({ row }) => {
-      return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 w-8 p-0">
-              <span className="sr-only">Open menu</span>
-              <MoreHorizontal className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem>Edit</DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      )
-    },
-  },
+  }
 ]
 
 const SavingTypeFormSchema = z.object({
@@ -199,6 +158,8 @@ export type SavingTypeFormValues = z.infer<typeof SavingTypeFormSchema>
 
 const metadata: Metadata<SavingRegulation, SavingRegulationFormValues> = {
   getUrl: "/regulation",
+  deleteUrl: "/regulation",
+  selectMultipleRow: true,
   create: {
     component: (data) => {
       return <CreateUpdateRegulationModal data={data} />

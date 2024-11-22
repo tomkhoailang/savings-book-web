@@ -30,12 +30,13 @@ import {useToast} from "@/hooks/use-toast"
 import {useDispatch, useSelector} from "react-redux"
 import {RootState} from "@/app/reducers/store"
 import {pageChange, updateTotalRow} from "@/app/reducers/datatableReducer"
-import UpdateModal from "./updateModal"
-import {MoreHorizontal} from "lucide-react"
+import {MoreHorizontal, Pencil} from "lucide-react"
 import {Metadata} from "@/app/interfaces/metadata"
 import {FieldValues} from "react-hook-form"
-import {Badge} from "../ui/badge"
-import CreateModal from "./createModal"
+import {Badge} from "../../ui/badge"
+import CreateModal from "./CreateModal"
+import UpdateModal from "./UpdateModal"
+import { Checkbox } from "@/components/ui/checkbox"
 
 interface DataTableProps<
   TData extends AuditedEntity,
@@ -65,39 +66,50 @@ export function DataTable<
   const [isCreateModalOpen, setIsCreateModalOpen] = React.useState(false)
   const [isDeleteModalOpen, setIsDeleteModalOpen] = React.useState(false)
 
-  const updatedColumns: ColumnDef<TData, TValue>[] = columns.map((column) => {
-    if (column.id === "actions") {
-      return {
-        ...column,
-        cell: ({row}: { row: Row<TData> }) => {
-          const regulation = row.original
-          return (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="h-8 w-8 p-0">
-                  <span className="sr-only">Open menu</span>
-                  <MoreHorizontal className="h-4 w-4"/>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                <DropdownMenuItem
-                  onClick={() => {
-                    setSelectedRowForUpdate(regulation as TData)
-                    setIsUpdateModalOpen(true)
-                    console.log("test")
-                  }}
-                >
-                  Edit
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          )
-        },
-      }
-    }
-    return column
-  })
+
+  let updatedColumns: ColumnDef<TData, TValue>[] = [...columns];
+  if (metadata.selectMultipleRow) {
+    updatedColumns.unshift({
+      id: "select",
+      header: ({ table }) => (
+        <Checkbox
+          checked={
+            table.getIsAllPageRowsSelected() ||
+            (table.getIsSomePageRowsSelected() && "indeterminate")
+          }
+          onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+          aria-label="Select all"
+        />
+      ),
+      cell: ({ row }) => (
+        <Checkbox
+          checked={row.getIsSelected()}
+          onCheckedChange={(value) => row.toggleSelected(!!value)}
+          aria-label="Select row"
+        />
+      ),
+      enableSorting: false,
+      enableHiding: false,
+    });
+  }
+  if (metadata.update) {
+    updatedColumns.push({
+      id: "actions",
+      cell: ({ row }: { row: Row<TData> }) => {
+        const regulation = row.original;
+        return (
+          <Pencil  size={36} className="cursor-pointer text-lg text-white bg-green-500  p-2 rounded-full" onClick={() => {
+            setSelectedRowForUpdate(regulation as TData);
+            setIsUpdateModalOpen(true);
+          }}/>
+          
+        );
+      },
+      enableSorting: false,
+      enableHiding: false,
+    });
+  }
+  
 
   const [pageSize, setPageSize] = React.useState(25)
   const [data, setData] = React.useState<TData[]>([])
@@ -149,7 +161,7 @@ export function DataTable<
       })
       .map((item) => item.id)
     const res = await proxyService.delete(
-      `/regulation?ids=${filteredData.join(",")}`
+      `${metadata.deleteUrl}?ids=${filteredData.join(",")}`
     )
 
     if (res.status !== 204) {
@@ -244,7 +256,8 @@ export function DataTable<
           >
             Create
           </Button>
-          <AlertDialog open={isDeleteModalOpen}>
+
+          {metadata.deleteUrl !== "" ? <AlertDialog open={isDeleteModalOpen}>
             <Button
               className="bg-red-500 rounded-lg"
               onClick={() => {
@@ -279,7 +292,7 @@ export function DataTable<
                 </AlertDialogAction>
               </AlertDialogFooter>
             </AlertDialogContent>
-          </AlertDialog>
+          </AlertDialog>: ""}
         </div>
       </div>
       <div className="rounded-md border">

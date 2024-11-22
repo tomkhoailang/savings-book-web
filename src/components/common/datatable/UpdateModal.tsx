@@ -46,7 +46,7 @@ export default function UpdateModal<
 
   const onSubmit = async (data: TFormValues) => {
     if (dataSource) {
-      const res = await proxyService.put(`/regulation/${dataSource.id}`, data)
+      const res = await proxyService.put(`${metadata.update?.url}/${dataSource.id}`, data)
       const content = await res.json()
 
       if (!res.ok) {
@@ -89,7 +89,14 @@ export default function UpdateModal<
               : ""}
 
             <DialogFooter>
-              <Button type="submit">Save changes</Button>
+              <Button
+                type="submit"
+                onClick={(e) => {
+                  console.log("check this method again", methods.getValues())
+                }}
+              >
+                Save changes
+              </Button>
             </DialogFooter>
           </form>
         </FormProvider>

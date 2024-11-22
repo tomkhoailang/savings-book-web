@@ -5,6 +5,7 @@ export interface Metadata<
   TFormValues extends FieldValues
 > {
   getUrl: string
+  selectMultipleRow: boolean
   create?: {
     component: (data: TData | null) => React.ReactNode
     url: string
@@ -13,6 +14,7 @@ export interface Metadata<
     component: (data: TData | null) => React.ReactNode
     url: string
   }
+  deleteUrl: string,
   handleResponseData?: (data: TData) => void
   formSchema: Resolver<TFormValues>
   getDefaultValue: (data: TData | null) => DefaultValues<TFormValues>

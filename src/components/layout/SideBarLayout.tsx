@@ -78,9 +78,12 @@ const SideBarLayout = () => {
             </div>
             <div className="parent-group  p-3 border-b-2 space-y-2  ">
               <div className="text-xs mb-2">Sổ tiết kiệm </div>
-              <div className="text-sm flex flex-row space-x-2 items-center">
+              <div
+                className="text-sm flex flex-row space-x-2 items-center cursor-pointer"
+                onClick={() => onSidebarItemClick("/savings-book")}
+              >
                 <BedSingle size={20} className="text-xs" />
-                <div>Mở sổ</div>
+                <div>Saving Book List</div>
               </div>
               <div
                 className="text-sm flex flex-row space-x-2 items-center cursor-pointer"

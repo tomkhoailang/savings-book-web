@@ -9,12 +9,13 @@ import {
 import { Input } from "../ui/input"
 import { Textarea } from "../ui/textarea"
 import { Label } from "../ui/label"
+import { number } from "zod"
 
 interface TextInputProps {
   control: any
   name: string
   label: string
-  defaultValue?: string
+  defaultValue?: string | number
   placeholder?: string
   textArea?: boolean
   className?: string
@@ -47,7 +48,7 @@ const TextInput: React.FC<TextInputProps> = ({
     <Controller
       name={name}
       control={control}
-      defaultValue={defaultValue}
+      defaultValue={typeof defaultValue === 'number' ? defaultValue : defaultValue.toString()}
       render={({ field, fieldState: { error, isTouched } }) => {
         return (
           <div className={`${inline ? "flex items-center" : ""} ${className}`}>

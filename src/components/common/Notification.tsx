@@ -13,7 +13,7 @@ import {
 import { Switch } from "@/components/ui/switch"
 import { useToast } from "@/hooks/use-toast"
 import { useAuth } from "@/app/contexts/authContext"
-import proxyService from "@/app/services/proxyService"
+import proxyService from "../../../utils/proxyService"
 import { ToastAction } from "../ui/toast"
 import { ScrollArea } from "../ui/scroll-area"
 import { Button } from "@nextui-org/react"
@@ -61,9 +61,9 @@ const Notification = () => {
       return
     }
 
-    const content = await res.json()
+    const content = res.data
 
-    if (res.ok) {
+    if (res.status <= 206) {
       if (content.totalCount !== totalCount) {
         setTotalCount(content.totalCount)
       }

@@ -1,6 +1,6 @@
 "use client"
 import { Metadata } from "@/app/interfaces/metadata"
-import proxyService from "@/app/services/proxyService"
+import proxyService from "../../../../utils/proxyService"
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -47,9 +47,9 @@ export default function UpdateModal<
   const onSubmit = async (data: TFormValues) => {
     if (dataSource) {
       const res = await proxyService.put(`${metadata.update?.url}/${dataSource.id}`, data)
-      const content = await res.json()
+      const content = res.data
 
-      if (!res.ok) {
+      if (res.status >= 400) {
         toast({
           title: "Error",
           description: content.error,

@@ -24,7 +24,7 @@ import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue,} from "@/
 
 import {ColumnDef, flexRender, getCoreRowModel, getPaginationRowModel, Row, useReactTable,} from "@tanstack/react-table"
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow,} from "@/components/ui/table"
-import proxyService from "@/app/services/proxyService"
+import proxyService from "../../../../utils/proxyService"
 import {useRouter} from "next/navigation"
 import {useToast} from "@/hooks/use-toast"
 import {useDispatch, useSelector} from "react-redux"
@@ -130,9 +130,10 @@ export function DataTable<
       })
       return
     }
-    const content = await res.json()
+    const content = res.data
 
-    if (!res.ok) {
+    if (res.status >= 400) {
+
     } else {
       setData((content.items as TData[]) ?? [])
       setTotalCount(content.totalCount)

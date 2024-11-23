@@ -24,7 +24,7 @@ import { Checkbox } from "../../ui/checkbox"
 import { CircleMinus, PlusCircle } from "lucide-react"
 import { useEffect, useState } from "react"
 import { ScrollArea } from "../../ui/scroll-area"
-import proxyService from "@/app/services/proxyService"
+import proxyService from "../../../../utils/proxyService"
 
 export function CreateUpdateRegulationModal({
   data,

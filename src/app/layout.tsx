@@ -4,6 +4,7 @@ import { ThemeProvider } from "@/components/common/theme-provider"
 import { Inter } from "next/font/google"
 import { Toaster } from "@/components/ui/toaster"
 import AuthProvider from "./contexts/authContext"
+import ToastBar from "@/components/common/ToastBar"
 
 const inter = Inter({ subsets: ["vietnamese"], weight: ["100", "300"] })
 

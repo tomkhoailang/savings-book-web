@@ -22,7 +22,7 @@ import { Form } from "@/components/ui/form"
 import TextInput from "@/components/common/InputText"
 import { log } from "console"
 import { ThemeToggle } from "@/components/common/ThemeToggle"
-import proxyService from "@/app/services/proxyService"
+import proxyService from "../../../../utils/proxyService"
 import { useState } from "react"
 import LoadingButton from "@/components/common/LoadingButton"
 import { useToast } from "@/hooks/use-toast"
@@ -120,9 +120,9 @@ const Login = () => {
     setLoading(true)
 
     const res = await proxyService.post("/auth/reset-password", values)
-    const content: ErrorResponse = await res.json()
+    const content: ErrorResponse = res.data
 
-    if (!res.ok) {
+    if (res.status >= 400) {
       toast({
         title: "Error",
         variant: "destructive",
@@ -148,9 +148,9 @@ const Login = () => {
     setLoading(true)
 
     const res = await proxyService.post("/auth/register", values)
-    const content: ErrorResponse = await res.json()
+    const content: ErrorResponse = res.data
 
-    if (!res.ok) {
+    if (res.status >= 400) {
       toast({
         title: "Error",
         variant: "destructive",
@@ -178,9 +178,9 @@ const Login = () => {
     setLoading(true)
 
     const res = await proxyService.post("/auth/login", values)
-    const content = await res.json()
+    const content = await res.data
 
-    if (!res.ok) {
+    if (res.status >= 400) {
       const errorContent = content as ErrorResponse
       toast({
         title: "Error",

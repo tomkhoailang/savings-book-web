@@ -125,7 +125,7 @@ const SideBarLayout = () => {
               </div>
             </div>
           </div>
-          <div className="profile-component w-full">
+          {/* <div className="profile-component w-full">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <div className="text-xs flex flex-row space-x-2 items-center p-2 cursor-pointer">
@@ -166,7 +166,7 @@ const SideBarLayout = () => {
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
-          </div>
+          </div> */}
         </div>
       </div>
     </>

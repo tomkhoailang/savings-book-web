@@ -1,5 +1,5 @@
 import { Metadata } from "@/app/interfaces/metadata"
-import proxyService from "@/app/services/proxyService"
+import proxyService from "../../../../utils/proxyService"
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -49,9 +49,9 @@ export default function CreateModal<
 
   const onSubmit = async (data: TFormValues) => {
     const res = await proxyService.post(`${metadata.create?.url}`, data)
-    const content = await res.json()
+    const content = res.data
 
-    if (!res.ok) {
+    if (res.status >= 400) {
       toast({
         title: "Error",
         variant: "destructive",

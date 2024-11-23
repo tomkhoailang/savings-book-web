@@ -19,7 +19,7 @@ import { Form } from "@/components/ui/form"
 import TextInput from "@/components/common/InputText"
 import { log } from "console"
 import { ThemeToggle } from "@/components/common/ThemeToggle"
-import proxyService from "@/app/services/proxyService"
+import proxyService from "../../../../utils/proxyService"
 import { useState } from "react"
 import LoadingButton from "@/components/common/LoadingButton"
 import { useToast } from "@/hooks/use-toast"
@@ -73,10 +73,10 @@ const ResetPassword = () => {
       values
     )
     console.log(res)
-    const content: ErrorResponse = await res.json()
+    const content: ErrorResponse = res.data
     console.log(content)
 
-    if (!res.ok) {
+    if (res.status >= 400) {
       toast({
         title: "Error",
         variant: "destructive",

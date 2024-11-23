@@ -134,8 +134,10 @@ const Notification = () => {
   }, [loading, paginate, totalCount])
 
   useEffect(() => {
-    const wsUrl = `ws://localhost:44342/api/v1/ws?token=${authContext?.accessToken}`
 
+    if (!authContext?.accessToken)  return
+
+    const wsUrl = `ws://localhost:44342/api/v1/ws?token=${authContext?.accessToken}`
     const ws = new WebSocket(wsUrl)
 
     ws.onopen = () => {
@@ -169,10 +171,9 @@ const Notification = () => {
       console.error("WebSocket error:", error)
       toast({
         title: "WebSocket Error",
-        variant: "default",
+        variant: "destructive",
         description: "Failed to connect to notification server",
-        duration: 3000,
-        className: "w-2/6 fixed top-8 right-16  text-white",
+        duration: 1500,
       })
     }
 

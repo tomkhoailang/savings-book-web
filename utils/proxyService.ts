@@ -43,7 +43,7 @@ const proxyService = {
 
   post: async (
     url: string,
-    data: any,
+    data?: any,
     headers: Record<string, string> = {},
     params: Record<string, string> = {}
   ) => {

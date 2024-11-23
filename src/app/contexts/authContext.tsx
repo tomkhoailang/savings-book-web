@@ -8,6 +8,8 @@ import React, {
 } from "react"
 
 import { jwtDecode } from "jwt-decode"
+import axios from "axios"
+import proxyService from "../../../utils/proxyService"
 
 interface AuthUser {
   username: string
@@ -56,7 +58,10 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
     setRefreshToken(refreshToken)
     setCurrentUser(jwtDecode<AuthUser>(accessToken))
   }
-  const logout = () => {
+  const logout = async () => {
+
+    await proxyService.post("/auth/logout")
+
     setAccessToken(null)
     setRefreshToken(null)
     setCurrentUser(null)
@@ -65,6 +70,7 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
     localStorage.removeItem("refreshToken")
     localStorage.removeItem("currentUser")
   }
+  
 
   return (
     <AuthContext.Provider

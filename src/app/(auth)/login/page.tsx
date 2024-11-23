@@ -180,7 +180,7 @@ const Login = () => {
     const res = await proxyService.post("/auth/login", values)
     const content = await res.data
 
-    if (res.status >= 400) {
+    if (res.status !== 201) {
       const errorContent = content as ErrorResponse
       toast({
         title: "Error",
@@ -194,8 +194,8 @@ const Login = () => {
       toast({
         title: "Login successfully",
         description: "Your will be redirect to dashboard soon",
+        variant: "success",
         duration: 1500,
-        className: "w-1/4 fixed top-8 right-16 bg-green-500 text-white",
       })
       authContext?.login(loginContent.access_token, loginContent.refresh_token)
       router.push("/pages/dashboard")

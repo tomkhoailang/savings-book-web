@@ -2,6 +2,7 @@ import { createSlice } from "@reduxjs/toolkit";
 
 
 const initialState = {
+  key: 0,
   duration: 1500,
   isShow: false,
   variant: null,
@@ -15,6 +16,7 @@ const ToastSlice = createSlice({
   initialState: initialState,
   reducers: {
     error: (state, action) => {
+      state.key++
       state.isShow = true
       state.variant = action.payload.variant
       state.title = action.payload.title
@@ -23,6 +25,7 @@ const ToastSlice = createSlice({
 
     },
     success: (state, action) => {
+      state.key++
       state.isShow = true
       state.variant = action.payload.variant
       state.title = action.payload.title
@@ -31,6 +34,7 @@ const ToastSlice = createSlice({
 
     },
     info: (state, action) => {
+      state.key++
       state.isShow = true
       state.variant = action.payload.variant
       state.title = action.payload.title

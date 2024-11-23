@@ -50,25 +50,8 @@ export default function CreateModal<
   const onSubmit = async (data: TFormValues) => {
     const res = await proxyService.post(`${metadata.create?.url}`, data)
     const content = res.data
-
-    if (res.status >= 400) {
-      toast({
-        title: "Error",
-        variant: "destructive",
-        description: content.error,
-        duration: 1500,
-        className: "top-0 right-0 fixed md:max-w-[420px] md:top-4 md:right-4",
-      })
-    } else {
-      toast({
-        title: "Sucessfully",
-        description: "Create completed",
-        duration: 1500,
-        className: "w-1/4 fixed top-8 right-16 bg-green-500 text-white",
-      })
-      setIsOpen(!isOpen)
-      whenClose(content)
-    }
+    setIsOpen(!isOpen)
+    whenClose(content)
   }
 
   return (

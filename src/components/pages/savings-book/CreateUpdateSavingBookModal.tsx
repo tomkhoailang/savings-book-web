@@ -60,7 +60,7 @@ export function CreateUpdateSavingBookModal({
   const fetchLatestSavingType = async () => {
     try {
       const response = await proxyService.get("/regulation/latest")
-      const content = await response.json()
+      const content = response.data
       if (content) {
         setLatestRegulation(content)
       }

@@ -26,6 +26,7 @@ interface TextInputProps {
   required?: boolean
   inline?: boolean
   number?: boolean
+  decimal?: boolean
 }
 
 const TextInput: React.FC<TextInputProps> = ({
@@ -43,6 +44,7 @@ const TextInput: React.FC<TextInputProps> = ({
   required,
   inline = false,
   number = false,
+  decimal = false
 }) => {
   return (
     <Controller
@@ -83,9 +85,14 @@ const TextInput: React.FC<TextInputProps> = ({
                   className={`${componentClassName} ${
                     error ? "border-red-500" : ""
                   }`}
+                  
                   onChange={(e) => {
-                    const value = e.target.value ? Number(e.target.value) : 0
-                    field.onChange(value >= 0 ? value : 0)
+                    const value = e.target.value;
+                    const regex = /^\d*\.?\d{0,2}$/;
+                    if (regex.test(value) || value === '') {
+                      const numValue = value === '' ? 0 : parseFloat(value);
+                      field.onChange(numValue >= 0 ? numValue : 0);
+                    }
                   }}
                 />
               ) : (

@@ -33,12 +33,7 @@ const proxyService = {
   ) => {
     const options = buildOptions(headers, params);
     const fullUrl = `${process.env.NEXT_PUBLIC_API_ENDPOINT}${url}`;
-    try {
-      const response = await axios.get(fullUrl, options);
-      return response;
-    } catch (error) {
-      throw error;
-    }
+    return await axios.get(fullUrl, options);
   },
 
   post: async (
@@ -54,12 +49,7 @@ const proxyService = {
 
     const options = buildOptions(headers, params);
     const fullUrl = `${process.env.NEXT_PUBLIC_API_ENDPOINT}${url}`;
-    try {
-      const response = await axios.post(fullUrl, data, options);
-      return response;
-    } catch (error) {
-      throw error;
-    }
+    return await axios.post(fullUrl, data, options);
   },
 
   put: async (
@@ -72,15 +62,10 @@ const proxyService = {
       headers = { ...headers, 'Content-Type': 'application/json' };
       data = JSON.stringify(data);
     }
-
     const options = buildOptions(headers, params);
     const fullUrl = `${process.env.NEXT_PUBLIC_API_ENDPOINT}${url}`;
-    try {
-      const response = await axios.put(fullUrl, data, options);
-      return response;
-    } catch (error) {
-      throw error;
-    }
+    return await axios.put(fullUrl, data, options);
+    
   },
 
   delete: async (
@@ -90,12 +75,7 @@ const proxyService = {
   ) => {
     const options = buildOptions(headers, params);
     const fullUrl = `${process.env.NEXT_PUBLIC_API_ENDPOINT}${url}`;
-    try {
-      const response = await axios.delete(fullUrl, options);
-      return response;
-    } catch (error) {
-      throw error;
-    }
+    return await axios.delete(fullUrl, options);
   },
 };
 

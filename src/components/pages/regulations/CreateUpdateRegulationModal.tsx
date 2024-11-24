@@ -104,6 +104,8 @@ export function CreateUpdateRegulationModal({
           placeholder="Min Withdraw Value"
           className=" w-1/2"
           number
+          decimal
+
         />
         <TextInput
           control={regulationForm.control}

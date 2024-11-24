@@ -47,9 +47,12 @@ export default function UpdateModal<
   const onSubmit = async (data: TFormValues) => {
     if (dataSource) {
       const res = await proxyService.put(`${metadata.update?.url}/${dataSource.id}`, data)
-      const content = res.data
-      setIsOpen(!isOpen)
-      whenClose(content)
+      if (res.status === 200 || res.status === 201) {
+        const content = res.data
+        setIsOpen(!isOpen)
+        whenClose(content)
+      }
+     
     }
   }
 

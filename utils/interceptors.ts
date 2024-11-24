@@ -1,7 +1,7 @@
 import { close, open } from "@/app/reducers/loadingReducer"
 import { AppDispatch } from "@/app/reducers/store"
 import { error, success } from "@/app/reducers/toastReducer"
-import axios from "axios"
+import axios, { AxiosError } from "axios"
 
 const excludeUrls = [
   "/auth/register",
@@ -75,23 +75,58 @@ export const interceptorService = (store: AppDispatch) => {
             break
         }
       }
-
       return response
     },
-    (err) => {
+    (err : AxiosError ) => {
       requestCounter--
       if (!requestCounter) store.dispatch(close())
-
-      store.dispatch(
-        error({
-          variant: "destructive",
-          title: "Something went wrong",
-          message: "There are one or more errors from server",
-          description: "",
+      
+      if (!err.response) {
+        return new Promise((resolve, reject) => {
+          store.dispatch(
+            error({
+              variant: "destructive",
+              title: "Something really bad happen",
+              message: "Check this out",
+              description: "",
+            })
+          )
+          resolve(err)
         })
-      )
+      }
+      
+      const { status, statusText, request } = err.response
+      console.log(statusText);
 
-      return Promise.reject(err)
+      switch (status) {
+        case 400:
+          return new Promise((resolve, reject) => {
+            store.dispatch(
+              error({
+                variant: "destructive",
+                title: "Bad request",
+                message: request.response,
+                description: "",
+              })
+            )
+            resolve(err);
+          });
+
+        default:
+
+          return new Promise((resolve, reject) => {
+            store.dispatch(
+              error({
+                variant: "destructive",
+                title: "Something went wrong",
+                message: "There are one or more errors from server",
+                description: "",
+              })
+            )
+            resolve(err);
+          });
+          
+      }
     }
   )
 }

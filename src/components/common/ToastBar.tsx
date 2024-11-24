@@ -13,7 +13,7 @@ const ToastBar = () => {
   useEffect(() => {
     if (toastReducer.isShow) {
       toast({
-        title: "Success",
+        title: toastReducer.title,
         variant: toastReducer.variant,
         description: toastReducer.message,
         duration: 1500,

@@ -6,6 +6,7 @@ import ToastBar from "@/components/common/ToastBar"
 import { Toaster } from "@/components/ui/toaster"
 import AuthProvider from "@/app/contexts/authContext"
 import { initializeStore } from "@/app/reducers/store"
+import LoadingOverlay from "./LoadingOverlay"
 
 export default function RootLayoutProviders({ children }: { children: React.ReactNode }) {
   const store = initializeStore()
@@ -21,6 +22,7 @@ export default function RootLayoutProviders({ children }: { children: React.Reac
         <AuthProvider>
           {children}
         </AuthProvider>
+        <LoadingOverlay/>
         <ToastBar />
         <Toaster />
       </ThemeProvider>

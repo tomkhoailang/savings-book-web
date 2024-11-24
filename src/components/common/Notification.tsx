@@ -34,7 +34,6 @@ const Notification = () => {
   const [loading, setLoading] = useState(false)
   const authContext = useAuth()
   const { toast } = useToast()
-  const router = useRouter()
   const scrollAreaRef = useRef(null)
   const observerRef = useRef(null)
 
@@ -49,21 +48,9 @@ const Notification = () => {
       }`
     )
 
-    if (res.status === 401) {
-      router.push("/login")
-      toast({
-        title: "Unauthorized",
-        description: "You don't have enough permission to access this page",
-        duration: 1500,
-        className: "top-0 right-0 fixed md:max-w-[420px] md:top-4 md:right-4",
-        variant: "destructive",
-      })
-      return
-    }
-
     const content = res.data
 
-    if (res.status <= 206) {
+    if (res.status === 200) {
       if (content.totalCount !== totalCount) {
         setTotalCount(content.totalCount)
       }

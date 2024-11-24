@@ -23,7 +23,7 @@ import TextInput from "@/components/common/InputText"
 import { log } from "console"
 import { ThemeToggle } from "@/components/common/ThemeToggle"
 import proxyService from "../../../../utils/proxyService"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import LoadingButton from "@/components/common/LoadingButton"
 import { useToast } from "@/hooks/use-toast"
 import { useAuth } from "@/app/contexts/authContext"
@@ -86,12 +86,22 @@ type LoginFormValues = z.infer<typeof loginFormSchema>
 type SendResetPasswordValues = z.infer<typeof sendResetPasswordSchema>
 
 const Login = () => {
+  const authContext = useAuth()
   const router = useRouter()
+
+  useEffect(() => {
+    if (typeof window !== "undefined" && authContext?.accessToken !== null) {
+      router.push("/pages/dashboard")
+    }
+  }, [authContext])
+
+ 
+
   const [loading, setLoading] = useState(false)
   const [activeTab, setActiveTab] = useState("login")
   const [isReset, setIsReset] = useState(false)
   const { toast } = useToast()
-  const authContext = useAuth()
+
 
   const registerForm = useForm<RegisterFormValues>({
     resolver: zodResolver(registerFormSchema),
@@ -198,7 +208,6 @@ const Login = () => {
         duration: 1500,
       })
       authContext?.login(loginContent.access_token, loginContent.refresh_token)
-      router.push("/pages/dashboard")
     }
     setLoading(false)
   }

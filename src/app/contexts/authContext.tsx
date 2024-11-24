@@ -60,15 +60,18 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
   }
   const logout = async () => {
 
-    await proxyService.post("/auth/logout")
 
     setAccessToken(null)
     setRefreshToken(null)
     setCurrentUser(null)
 
+    await proxyService.post("/auth/logout")
+
     localStorage.removeItem("accessToken")
     localStorage.removeItem("refreshToken")
     localStorage.removeItem("currentUser")
+
+
   }
   
 

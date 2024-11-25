@@ -19,12 +19,13 @@ import {
 
 import { Input } from "@/components/ui/input"
 import { Controller, useForm, useFormContext } from "react-hook-form"
-import TextInput from "../../common/InputText"
+import TextInput from "../../common/TextInput"
 import { Checkbox } from "../../ui/checkbox"
 import { CircleMinus, PlusCircle } from "lucide-react"
 import { useEffect, useState } from "react"
 import { ScrollArea } from "../../ui/scroll-area"
 import proxyService from "../../../../utils/proxyService"
+import NumberInput from "@/components/common/NumberInput"
 
 export function CreateUpdateRegulationModal({
   data,
@@ -50,18 +51,30 @@ export function CreateUpdateRegulationModal({
   }, [savingType])
 
   const onAddSavingTypeBtn = () => {
-    const lastSavingType = savingType[savingType.length - 1]
+    const lastSavingType = savingType.reduce((max, current) => {
+      return current.interestRate > max.interestRate ? current: max
+    }, savingType[0])
 
-    setSavingType([
-      ...savingType,
-      {
-        interestRate: parseFloat(
-          (lastSavingType?.interestRate + 0.05).toFixed(2)
-        ),
-        name: "",
-        term: lastSavingType?.term + 1,
-      },
-    ])
+    let newSavingType = {
+      interestRate: parseFloat(
+        (lastSavingType?.interestRate + 0.05).toFixed(2)
+      ),
+      name: "",
+      term: lastSavingType?.term + 1,
+    }
+
+    if (regulationForm.formState.errors.savingTypes) {
+      newSavingType.term = 0
+      newSavingType.interestRate = parseFloat(
+        (lastSavingType?.interestRate - 0.01).toFixed(2)
+      )
+    }
+
+    setSavingType([...savingType, newSavingType])
+    regulationForm.setValue(
+      `savingTypes[${savingType.length}]` as any,
+      newSavingType
+    )
   }
   const onRemoveSavingTypeBtn = (id: number) => {
     setSavingType(savingType.filter((type, index) => index !== id))
@@ -72,48 +85,27 @@ export function CreateUpdateRegulationModal({
     setSavingType(data ? data.savingTypes : [defaultSavingType])
   }, [isOpen])
 
-  const onRowContentChange = (
-    index: number,
-    field: keyof SavingType,
-    value: string
-  ) => {
-    setSavingType(
-      savingType.map((type, id) => {
-        return id === index
-          ? {
-              ...type,
-              [field]:
-                field === "name"
-                  ? value
-                  : parseFloat(value) >= 0
-                  ? parseFloat(value)
-                  : 0,
-            }
-          : type
-      })
-    )
+  const onRowContentChange = () => {
+    setSavingType(regulationForm.getValues("savingTypes"))
   }
 
   return (
     <>
       <div className="flex flex-row justify-between space-x-5">
-        <TextInput
+        <NumberInput
           control={regulationForm.control}
           name="minWithdrawValue"
           label="Min Withdraw Value"
           placeholder="Min Withdraw Value"
           className=" w-1/2"
-          number
-          decimal
-
+          decimalPoint={2}
         />
-        <TextInput
+        <NumberInput
           control={regulationForm.control}
           name="minWithdrawDay"
           label="Min Withdraw Day"
           placeholder="Min Withdraw Day"
           className=" w-1/2"
-          number
         />
       </div>
       <div className="mt-2">
@@ -140,37 +132,30 @@ export function CreateUpdateRegulationModal({
               {savingType.map((saving, index) => (
                 <TableRow key={`${data?.id}-${index}`}>
                   <TableCell className="p-2">
-                    <Input
-                      value={saving.name}
-                      onChange={(e) =>
-                        onRowContentChange(index, "name", e.target.value)
-                      }
+                    <TextInput
+                      name={`savingTypes[${index}].name`}
                       className="w-full"
+                      required={false}
+                      control={regulationForm.control}
                     />
                   </TableCell>
                   <TableCell className="p-2">
-                    <Input
-                      value={saving.term}
-                      onChange={(e) => {
-                        const value = Math.min(Number(e.target.value), 120)
-                        onRowContentChange(index, "term", value.toString())
-                      }}
-                      className="w-full"
+                    <NumberInput
+                      control={regulationForm.control}
+                      name={`savingTypes[${index}].term`}
+                      placeholder="Default: 0"
+                      required={false}
+                      change={onRowContentChange}
                     />
                   </TableCell>
                   <TableCell className="p-2">
-                    <Input
-                      type="number"
-                      step="0.01"
-                      value={saving.interestRate}
-                      onChange={(e) =>
-                        onRowContentChange(
-                          index,
-                          "interestRate",
-                          e.target.value
-                        )
-                      }
-                      className="w-full"
+                    <NumberInput
+                      control={regulationForm.control}
+                      name={`savingTypes[${index}].interestRate`}
+                      placeholder="Interest rate"
+                      required={false}
+                      decimalPoint={2}
+                      step={0.01}
                     />
                   </TableCell>
                   <TableCell className="p-2">

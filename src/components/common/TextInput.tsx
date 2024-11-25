@@ -14,7 +14,7 @@ import { number } from "zod"
 interface TextInputProps {
   control: any
   name: string
-  label: string
+  label?: string
   defaultValue?: string | number
   placeholder?: string
   textArea?: boolean
@@ -54,9 +54,9 @@ const TextInput: React.FC<TextInputProps> = ({
       render={({ field, fieldState: { error, isTouched } }) => {
         return (
           <div className={`${inline ? "flex items-center" : ""} ${className}`}>
-            <Label className={inline ? "mr-2" : "block"}>
+           {label &&  <Label className={inline ? "mr-2" : "block"}>
               {label} {required ? <span className="text-red-500">*</span> : ""}
-            </Label>
+            </Label>}
             <div className={inline ? "" : "mt-1"}>
               {textArea ? (
                 <Textarea

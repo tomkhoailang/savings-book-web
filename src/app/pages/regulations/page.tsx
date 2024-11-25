@@ -56,9 +56,9 @@ const columns: ColumnDef<SavingRegulation>[] = [
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="text-white">Saving Type</TableHead>
-                    <TableHead className="text-white">Term</TableHead>
-                    <TableHead className="text-white">Interest Rate</TableHead>
+                    <TableHead >Saving Type</TableHead>
+                    <TableHead >Term</TableHead>
+                    <TableHead >Interest Rate</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -119,14 +119,14 @@ const SavingTypeFormSchema = z.object({
   interestRate: z.number(),
 })
 const SavingRegulationSchema = z.object({
-  minWithdrawValue: z.number(),
+  minWithdrawValue: z.number().min(10, { message: "Min withdraw value must be at least 10" }),
   savingTypes: z
     .array(SavingTypeFormSchema)
     .refine(
       (savingTypes) =>
         savingTypes.filter((type) => type.term === 0).length === 1,
       {
-        message: "Need regulation for only 0 term.",
+        message: "Term - Default:0 should not be removed",
       }
     )
     .refine(
@@ -149,7 +149,7 @@ const SavingRegulationSchema = z.object({
       }
     ),
 
-  minWithdrawDay: z.number(),
+  minWithdrawDay: z.number().min(1, { message: "Min withdraw day must be at least 1" }),
   isActive: z.boolean(),
 })
 

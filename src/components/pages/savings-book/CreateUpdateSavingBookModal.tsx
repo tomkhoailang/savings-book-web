@@ -18,7 +18,7 @@ import {
 
 import { Input } from "@/components/ui/input"
 import { Controller, useForm, useFormContext } from "react-hook-form"
-import TextInput from "../../common/InputText"
+import TextInput from "../../common/TextInput"
 import { Checkbox } from "../../ui/checkbox"
 import { CircleMinus, PlusCircle } from "lucide-react"
 import { useEffect, useState } from "react"

@@ -21,8 +21,10 @@ interface TextInputProps {
   inline?: boolean
   decimalPoint?: number
   step?: number
-  required?: boolean,
+  required?: boolean
   change?: any
+  min?: number
+  max?: number
 }
 
 const NumberInput: React.FC<TextInputProps> = ({
@@ -36,7 +38,9 @@ const NumberInput: React.FC<TextInputProps> = ({
   inline = false,
   step = 1,
   decimalPoint = 0,
-  change
+  change,
+  min,
+  max,
 }) => {
   return (
     <Controller
@@ -46,36 +50,70 @@ const NumberInput: React.FC<TextInputProps> = ({
       render={({ field, fieldState: { error, isTouched } }) => {
         return (
           <div className={`${inline ? "flex items-center" : ""} ${className}`}>
-            {label && <Label className={inline ? "mr-2" : "block"}>
-              {label} {required ? <span className="text-red-500">*</span> : ""}
-            </Label>}
-            <Input
-              type="number"
-              placeholder={placeholder}
-              {...field}
-              className={`${error ? "border-red-500" : ""} mt-1`}
-              value={field.value === 0 ? "" : field.value}  
-              step={step}
-              onChange={(e) => {
-                let inputValue = e.target.value
-                inputValue = inputValue.replace(/^0+/, "")
-                if (decimalPoint !== 0) {
+            {label && (
+              <Label className={inline ? "mr-2" : "block"}>
+                {label}{" "}
+                {required ? <span className="text-red-500">*</span> : ""}
+              </Label>
+            )}
+
+            {decimalPoint !== 0 ? (
+              <Input
+                type="number"
+                min={min}
+                max={max}
+                placeholder={placeholder}
+                {...field}
+                className={`${error ? "border-red-500" : ""} mt-1`}
+                step={step}
+                onChange={(e) => {
+                  let inputValue = e.target.value
+                  inputValue = inputValue.replace(/^0+/, "")
                   const regex = new RegExp(`^\\d*\\.?\\d{0,${decimalPoint}}$`)
                   if (regex.test(inputValue) || inputValue === "") {
                     let numValue = inputValue === "" ? 0 : parseFloat(inputValue)
-                    field.onChange(numValue >= 0 ? numValue : 0)
+
+                    numValue = numValue >= 0 ? numValue : 0
+                    if (max) {
+                      numValue = numValue >= max ? max : numValue
+                    }
+
+                    field.onChange(numValue)
+                    e.target.value = "0.1"
                   }
-                } else {
-                  inputValue = inputValue.replace(/[.,]/g, "");
-                  let numValue = inputValue === "" ? 0 : parseFloat(inputValue);
-                  field.onChange(numValue >= 0 ? numValue : 0);
-                }
-                if (change && typeof change === "function") {
-                  change()
-                }
-                
-              }}
-            />
+                  if (change && typeof change === "function") {
+                    change()
+                  }
+                }}
+              />
+            ) : (
+              <Input
+                type="number"
+                min={min}
+                max={max}
+                placeholder={placeholder}
+                {...field}
+                className={`${error ? "border-red-500" : ""} mt-1`}
+                step={step}
+                onChange={(e) => {
+                  let inputValue = e.target.value
+                  inputValue = inputValue.replace(/^0+/, "")
+                  let numValue = inputValue === "" ? 0 : parseFloat(inputValue)
+
+                  numValue = numValue >= 0 ? numValue : 0
+                  if (max) {
+                    numValue = numValue >= max ? max : numValue
+                  }
+
+                  field.onChange(numValue)
+
+                  e.target.value = "0.1"
+                  if (change && typeof change === "function") {
+                    change()
+                  }
+                }}
+              />
+            )}
 
             {error && (
               <p className="text-red-500 text-xs mt-1">{error.message}</p>

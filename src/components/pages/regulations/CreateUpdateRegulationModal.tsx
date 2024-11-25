@@ -99,6 +99,7 @@ export function CreateUpdateRegulationModal({
           placeholder="Min Withdraw Value"
           className=" w-1/2"
           decimalPoint={2}
+          min={10}
         />
         <NumberInput
           control={regulationForm.control}
@@ -106,6 +107,7 @@ export function CreateUpdateRegulationModal({
           label="Min Withdraw Day"
           placeholder="Min Withdraw Day"
           className=" w-1/2"
+          min={10}
         />
       </div>
       <div className="mt-2">
@@ -143,6 +145,7 @@ export function CreateUpdateRegulationModal({
                     <NumberInput
                       control={regulationForm.control}
                       name={`savingTypes[${index}].term`}
+                      max={120}
                       placeholder="Default: 0"
                       required={false}
                       change={onRowContentChange}
@@ -156,6 +159,8 @@ export function CreateUpdateRegulationModal({
                       required={false}
                       decimalPoint={2}
                       step={0.01}
+                      min={0.01}
+                      max={10}
                     />
                   </TableCell>
                   <TableCell className="p-2">

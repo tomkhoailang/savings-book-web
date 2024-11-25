@@ -115,7 +115,7 @@ const columns: ColumnDef<SavingRegulation>[] = [
 
 const SavingTypeFormSchema = z.object({
   name: z.string(),
-  term: z.number().min(0),
+  term: z.number(),
   interestRate: z.number(),
 })
 const SavingRegulationSchema = z.object({
@@ -126,7 +126,7 @@ const SavingRegulationSchema = z.object({
       (savingTypes) =>
         savingTypes.filter((type) => type.term === 0).length === 1,
       {
-        message: "Term - Default:0 should not be removed",
+        message: "Must have only one zero term",
       }
     )
     .refine(

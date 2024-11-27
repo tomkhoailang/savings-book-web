@@ -247,7 +247,7 @@ const Notification = () => {
                 <div ref={observerRef} />
               </div>
             </ScrollArea>
-            {paginate.current === 1 ? (
+            {paginate.current === 1 && totalCount !== 0 ? (
               <Button
                 className="w-full bg-gray-600 text-white"
                 onClick={() => onLoadMore()}

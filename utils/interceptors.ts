@@ -11,6 +11,7 @@ const excludeUrls = [
   "/auth/change-password",
   "/auth/renew-access",
   "/auth/logout",
+  
 ]
 
 export const interceptorService = (store: AppDispatch) => {
@@ -18,6 +19,11 @@ export const interceptorService = (store: AppDispatch) => {
 
   axios.interceptors.request.use(
     (cfg) => {
+      const currentUrl =
+        cfg.url?.replace(process.env.NEXT_PUBLIC_API_ENDPOINT || "", "") 
+      if (currentUrl?.includes("/notification")) {
+        return cfg
+      }
       requestCounter++
       store.dispatch(open())
       return cfg
@@ -31,14 +37,13 @@ export const interceptorService = (store: AppDispatch) => {
   axios.interceptors.response.use(
     (response) => {
       requestCounter--
-      if (!requestCounter) {
-        store.dispatch(close())
-      }
+      store.dispatch(close())
 
-      const currentUrl = response.config.url?.replace(
-        process.env.NEXT_PUBLIC_API_ENDPOINT || "",
-        ""
-      ) ?? ""
+      const currentUrl =
+        response.config.url?.replace(
+          process.env.NEXT_PUBLIC_API_ENDPOINT || "",
+          ""
+        ) ?? ""
 
       if (!excludeUrls.includes(currentUrl)) {
         switch (response.config.method) {
@@ -77,10 +82,10 @@ export const interceptorService = (store: AppDispatch) => {
       }
       return response
     },
-    (err : AxiosError ) => {
+    (err: AxiosError) => {
       requestCounter--
-      if (!requestCounter) store.dispatch(close())
-      
+      store.dispatch(close())
+
       if (!err.response) {
         return new Promise((resolve, reject) => {
           store.dispatch(
@@ -94,9 +99,11 @@ export const interceptorService = (store: AppDispatch) => {
           resolve(err)
         })
       }
-      
+
       const { status, statusText, request } = err.response
-      console.log(statusText);
+
+
+      const mesasge = JSON.parse(request.response)
 
       switch (status) {
         case 400:
@@ -105,15 +112,30 @@ export const interceptorService = (store: AppDispatch) => {
               error({
                 variant: "destructive",
                 title: "Bad request",
-                message: request.response,
+                message: mesasge.error ?? `${mesasge[0]?.message + mesasge[0]?.field}`,
                 description: "",
               })
             )
-            resolve(err);
-          });
+            resolve(err)
+          })
+        case 401:
+          localStorage.removeItem("accessToken")
+          localStorage.removeItem("refreshToken")
+          localStorage.removeItem("currentUser")
+          return new Promise((resolve, reject) => {
+            store.dispatch(
+              error({
+                variant: "destructive",
+                title: "Unauthorized",
+                message:
+                  "You don't have enough permission to perform this action",
+                description: "",
+              })
+            )
+            resolve(err)
+          })
 
         default:
-
           return new Promise((resolve, reject) => {
             store.dispatch(
               error({
@@ -123,9 +145,8 @@ export const interceptorService = (store: AppDispatch) => {
                 description: "",
               })
             )
-            resolve(err);
-          });
-          
+            resolve(err)
+          })
       }
     }
   )

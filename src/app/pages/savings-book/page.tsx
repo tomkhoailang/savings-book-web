@@ -3,7 +3,7 @@ import moment from "moment"
 import { z } from "zod"
 import { ColumnDef } from "@tanstack/react-table"
 import { Checkbox } from "@/components/ui/checkbox"
-import { Check, List, MoreHorizontal } from "lucide-react"
+import { Check, List, MoreHorizontal, SplitSquareVertical } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
@@ -58,8 +58,11 @@ export interface SavingBook extends AuditedEntity {
 
 const columns: ColumnDef<SavingBook>[] = [
   {
-    accessorKey: "minWithdrawDay",
-    header: "Min Withdraw Day",
+    header: "Address",
+    cell: ({ row }) => {
+      const savingBook = row.original
+      return `${savingBook.address.street ?? ""}, ${savingBook.address.city ?? ""}, ${savingBook.address.country ?? ""}`
+    },
   },
   {
     accessorKey: "minWithdrawValue",
@@ -67,8 +70,8 @@ const columns: ColumnDef<SavingBook>[] = [
   },
   {
     cell: ({ row }) => {
-      const regulation = row.original
-      if (regulation.isActive) {
+      const savingBook = row.original
+      if (savingBook.isActive) {
         return <Check className="text-green-400 w-full" />
       }
     },
@@ -78,20 +81,20 @@ const columns: ColumnDef<SavingBook>[] = [
     accessorKey: "creationTime",
     header: "Creation Time",
     cell: ({ row }) => {
-      const regulation = row.original
+      const savingBook = row.original
 
-      return moment(regulation.creationTime).format("DD/MM/YYYY HH:mm:ss")
+      return moment(savingBook.creationTime).format("DD/MM/YYYY HH:mm:ss")
     },
   },
   {
     accessorKey: "lastModificationTime",
     cell: ({ row }) => {
-      const regulation = row.original
+      const savingBook = row.original
 
-      if (new Date(regulation.lastModificationTime).getFullYear() === 1) {
+      if (new Date(savingBook.lastModificationTime).getFullYear() === 1) {
         return ""
       }
-      return moment(regulation.lastModificationTime).format(
+      return moment(savingBook.lastModificationTime).format(
         "DD/MM/YYYY HH:mm:ss"
       )
     },
@@ -101,7 +104,7 @@ const columns: ColumnDef<SavingBook>[] = [
 
 const SavingBookSchema = z.object({
   address: ZodAddress,
-  idCardNumber: z.string(),
+  idCardNumber: z.string().min(9, {message: "Id card number must be at least 9 character"}).max(12, {message: "Id card number cannot exceeds 12 characters"}),
   term: z.number(),
   newPaymentAmount: z.number(),
 })

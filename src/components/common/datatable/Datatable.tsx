@@ -121,14 +121,15 @@ export function DataTable<
       cell: ({ row }: { row: Row<TData> }) => {
         const regulation = row.original
         return (
-          <Pencil
-            size={36}
-            className="cursor-pointer text-lg text-white bg-green-500  p-2 rounded-full"
+          <div
+            className="cursor-pointer bg-green-500 rounded-full p-2 inline-flex items-center justify-center"
             onClick={() => {
               setSelectedRowForUpdate(regulation as TData)
               setIsUpdateModalOpen(true)
             }}
-          />
+          >
+            <Pencil size={20} className="text-white" />
+          </div>
         )
       },
       enableSorting: false,
@@ -144,25 +145,14 @@ export function DataTable<
 
   const fetchData = async (url: string) => {
     const res = await proxyService.get(url)
-    if (res.status == 401) {
-      router.push("/login")
-      toast({
-        title: "Unauthorized",
-        description: "You don't have enough permission to access this page",
-        duration: 1500,
-        className: "top-0 right-0 fixed md:max-w-[420px] md:top-4 md:right-4",
-        variant: "destructive",
-      })
-      return
-    }
+   
     const content = res.data
 
-    if (res.status >= 400) {
-    } else {
+    if (res.status === 200) {
       setData((content.items as TData[]) ?? [])
       setTotalCount(content.totalCount)
       dispatch(updateTotalRow(content.totalCount))
-    }
+    } 
   }
   const whenUpdateClose = (resData: TData) => {
     const newData = data.map((item) => {
@@ -206,9 +196,9 @@ export function DataTable<
     }
   }
 
-  useEffect(() => {
-    fetchData(metadata.getUrl)
-  }, [])
+  // useEffect(() => {
+  //   fetchData(metadata.getUrl)
+  // }, [])
 
   useEffect(() => {
     fetchData(metadata.getUrl + datatableReducer.query)

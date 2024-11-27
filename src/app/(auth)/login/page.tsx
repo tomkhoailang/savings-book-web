@@ -28,6 +28,7 @@ import LoadingButton from "@/components/common/LoadingButton"
 import { useToast } from "@/hooks/use-toast"
 import { useAuth } from "@/app/contexts/authContext"
 import { useRouter } from "next/navigation"
+import { Rss } from "lucide-react"
 
 const registerFormSchema = z
   .object({
@@ -95,13 +96,10 @@ const Login = () => {
     }
   }, [authContext])
 
- 
-
   const [loading, setLoading] = useState(false)
   const [activeTab, setActiveTab] = useState("login")
   const [isReset, setIsReset] = useState(false)
   const { toast } = useToast()
-
 
   const registerForm = useForm<RegisterFormValues>({
     resolver: zodResolver(registerFormSchema),
@@ -132,15 +130,7 @@ const Login = () => {
     const res = await proxyService.post("/auth/reset-password", values)
     const content: ErrorResponse = res.data
 
-    if (res.status >= 400) {
-      toast({
-        title: "Error",
-        variant: "destructive",
-        description: content.error,
-        duration: 1500,
-        className: "top-0 right-0 fixed md:max-w-[420px] md:top-4 md:right-4",
-      })
-    } else {
+    if (res.status === 200 || res.status === 201) {
       toast({
         title: "Success",
         variant: "default",
@@ -160,15 +150,7 @@ const Login = () => {
     const res = await proxyService.post("/auth/register", values)
     const content: ErrorResponse = res.data
 
-    if (res.status >= 400) {
-      toast({
-        title: "Error",
-        variant: "destructive",
-        description: content.error,
-        duration: 1500,
-        className: "top-0 right-0 fixed md:max-w-[420px] md:top-4 md:right-4",
-      })
-    } else {
+    if (res.status === 200 || res.status === 201) {
       toast({
         title: "Sign up complete",
         variant: "default",
@@ -190,16 +172,7 @@ const Login = () => {
     const res = await proxyService.post("/auth/login", values)
     const content = await res.data
 
-    if (res.status !== 201) {
-      const errorContent = content as ErrorResponse
-      toast({
-        title: "Error",
-        variant: "destructive",
-        description: errorContent.error,
-        duration: 1500,
-        className: "top-0 right-0 fixed md:max-w-[420px] md:top-4 md:right-4",
-      })
-    } else {
+    if (res.status === 201) {
       const loginContent = content as LoginResponse
       toast({
         title: "Login successfully",

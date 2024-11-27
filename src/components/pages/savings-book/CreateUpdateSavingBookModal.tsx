@@ -32,6 +32,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import DropdownControl from "@/components/common/DropdownControl"
 
 interface SavingType {
   name: string
@@ -71,6 +72,13 @@ export function CreateUpdateSavingBookModal({
     return ""
   }
 
+  const latestRegulationMap = latestRegulation.savingTypes.map((item, index) => {
+    return {
+      value: item.term,
+      label: item.term === 0  ? `Demand deposit - ${item.interestRate}%` : `Term: ${item.term} months - ${item.interestRate}%`}
+    }
+  )
+
   return (
     <>
       <div className="flex flex-row justify-between space-x-5">
@@ -80,6 +88,8 @@ export function CreateUpdateSavingBookModal({
           label="ID Card Number"
           placeholder="ID Card Number"
           className=" w-1/2"
+          maxlength={12}
+          required
         />
         <TextInput
           control={savingBookForm.control}
@@ -89,6 +99,8 @@ export function CreateUpdateSavingBookModal({
           defaultValue={latestRegulation.minWithdrawValue}
           placeholder="Balance"
           className=" w-1/2"
+          required
+
         />
       </div>
       <div className="flex flex-col justify-between  space-y-2">
@@ -129,27 +141,11 @@ export function CreateUpdateSavingBookModal({
 
       <div className="flex flex-row justify-between space-x-5">
         <div className="w-1/2">
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Select Term
-          </label>
-          <Select
-            onValueChange={(value) => {
-              savingBookForm.setValue("term", parseInt(value))
-            }}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Select a term" />
-            </SelectTrigger>
-            <SelectContent>
-              {latestRegulation.savingTypes.map((type) => (
-                <SelectItem key={type.term} value={type.term.toString()}>
-                  {type.term === 0
-                    ? `Demand deposit - ${type.interestRate}%`
-                    : `Term: ${type.term} months - ${type.interestRate}%`}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <DropdownControl
+            control={savingBookForm.control}
+            datasource={latestRegulationMap}
+            name="term"
+          />
         </div>
       </div>
     </>

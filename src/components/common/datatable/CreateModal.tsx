@@ -50,8 +50,11 @@ export default function CreateModal<
   const onSubmit = async (data: TFormValues) => {
     const res = await proxyService.post(`${metadata.create?.url}`, data)
     const content = res.data
-    setIsOpen(!isOpen)
-    whenClose(content)
+    if (res.status === 200 || res.status === 201 ) {
+      setIsOpen(!isOpen)
+      whenClose(content)
+    }
+   
   }
 
   return (

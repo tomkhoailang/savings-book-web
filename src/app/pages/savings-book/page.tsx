@@ -3,7 +3,13 @@ import moment from "moment"
 import { z } from "zod"
 import { ColumnDef } from "@tanstack/react-table"
 import { Checkbox } from "@/components/ui/checkbox"
-import { Check, List, MoreHorizontal, SplitSquareVertical } from "lucide-react"
+import {
+  Check,
+  CreditCard,
+  List,
+  MoreHorizontal,
+  SplitSquareVertical,
+} from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
@@ -32,6 +38,12 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { DataTable } from "@/components/common/datatable/Datatable"
 import Address, { ZodAddress } from "@/app/interfaces/common/address"
 import { CreateUpdateSavingBookModal } from "@/components/pages/savings-book/CreateUpdateSavingBookModal"
+import { useEffect } from "react"
+import { useSearchParams } from "next/navigation"
+
+const statusMap: Record<string, string> = {
+  init: "Waiting to complete payment",
+}
 
 export interface BookRegulation {
   regulationIdRef: string
@@ -49,7 +61,10 @@ export interface SavingBook extends AuditedEntity {
   regulations: BookRegulation[]
   address: Address
   idCardNumber: string
+  status: string
+  paymentUrl: string
   balance: number
+  pendingBalance: number
   nextSchedule: Date
   isActive: boolean
   newPaymentAmount: number
@@ -58,15 +73,41 @@ export interface SavingBook extends AuditedEntity {
 
 const columns: ColumnDef<SavingBook>[] = [
   {
+    header: "Id Card Number",
+    accessorKey: "idCardNumber",
+  },
+  {
     header: "Address",
     cell: ({ row }) => {
       const savingBook = row.original
-      return `${savingBook.address.street ?? ""}, ${savingBook.address.city ?? ""}, ${savingBook.address.country ?? ""}`
+
+      return `${savingBook.address.street ?? ""} ${
+        savingBook.address.city ?? ""
+      } ${savingBook.address.country ?? ""}`
     },
   },
   {
-    accessorKey: "minWithdrawValue",
-    header: "Min Withdraw Value",
+    header: "Current Balance",
+    cell: ({ row }) => {
+      const savingBook = row.original
+
+      return `${savingBook.balance} $`
+    },
+  },
+  {
+    header: "Pending Balance",
+    cell: ({ row }) => {
+      const savingBook = row.original
+
+      return `${savingBook.pendingBalance} $`
+    },
+  },
+  {
+    header: "Status",
+    cell: ({ row }) => {
+      const savingBook = row.original
+      return `${statusMap[savingBook.status]}`
+    },
   },
   {
     cell: ({ row }) => {
@@ -87,24 +128,46 @@ const columns: ColumnDef<SavingBook>[] = [
     },
   },
   {
-    accessorKey: "lastModificationTime",
+    header: "Action",
     cell: ({ row }) => {
       const savingBook = row.original
-
-      if (new Date(savingBook.lastModificationTime).getFullYear() === 1) {
-        return ""
-      }
-      return moment(savingBook.lastModificationTime).format(
-        "DD/MM/YYYY HH:mm:ss"
+      return savingBook.pendingBalance !== 0 ? (
+        <div className="flex justify-center space-x-2 text-center cursor-pointer text-green-500"
+          onClick={() => {
+            window.open(`${savingBook.paymentUrl}`,"_blank")
+          }}
+        >
+          <CreditCard  size={24} /> 
+          <span className="leading-6" >Paynow</span>
+        </div>
+      ) : (
+        ""
       )
     },
-    header: "Last Modification Time",
-  }
+  },
+
+  // {
+  //   accessorKey: "lastModificationTime",
+  //   cell: ({ row }) => {
+  //     const savingBook = row.original
+
+  //     if (new Date(savingBook.lastModificationTime).getFullYear() === 1) {
+  //       return ""
+  //     }
+  //     return moment(savingBook.lastModificationTime).format(
+  //       "DD/MM/YYYY HH:mm:ss"
+  //     )
+  //   },
+  //   header: "Last Modification Time",
+  // }
 ]
 
 const SavingBookSchema = z.object({
   address: ZodAddress,
-  idCardNumber: z.string().min(9, {message: "Id card number must be at least 9 character"}).max(12, {message: "Id card number cannot exceeds 12 characters"}),
+  idCardNumber: z
+    .string()
+    .min(9, { message: "Id card number must be at least 9 character" })
+    .max(12, { message: "Id card number cannot exceeds 12 characters" }),
   term: z.number(),
   newPaymentAmount: z.number(),
 })
@@ -140,6 +203,11 @@ const metadata: Metadata<SavingBook, SavingBookFormValues> = {
 }
 
 const SavingBookPage = () => {
+  const router = useSearchParams()
+
+  console.log(router.get("token"));
+
+
   return (
     <div className="container mx-auto py-10">
       <DataTable columns={columns} metadata={metadata} />

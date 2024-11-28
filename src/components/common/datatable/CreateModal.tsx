@@ -9,10 +9,11 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { useToast } from "@/hooks/use-toast"
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import { FieldValues, FormProvider, useForm } from "react-hook-form"
 import { useDispatch, useSelector } from "react-redux"
 import { RootState } from "@/app/reducers/store"
+import LoadingButton from "../LoadingButton"
 
 export default function CreateModal<
   TData extends AuditedEntity,
@@ -30,11 +31,7 @@ export default function CreateModal<
   setIsOpen: (isOpen: boolean) => void
   whenClose: (newData: TData) => void
 }) {
-  const { toast } = useToast()
-  const datatableReducer = useSelector(
-    (state: RootState) => state.datatableReducer
-  )
-  const dispatch = useDispatch()
+  const [isLoading, setIsLoading] = useState(false)
 
   const methods = useForm<TFormValues>({
     resolver: metadata.formSchema,
@@ -48,13 +45,14 @@ export default function CreateModal<
   }, [dataSource, isOpen, metadata, methods])
 
   const onSubmit = async (data: TFormValues) => {
+    setIsLoading(true)
     const res = await proxyService.post(`${metadata.create?.url}`, data)
     const content = res.data
-    if (res.status === 200 || res.status === 201 ) {
+    if (res.status === 200 || res.status === 201) {
       setIsOpen(!isOpen)
       whenClose(content)
     }
-   
+    setIsLoading(false)
   }
 
   return (
@@ -76,14 +74,14 @@ export default function CreateModal<
               : ""}
 
             <DialogFooter>
-              <Button
-                type="submit"
-                onClick={(e) => {
+              <LoadingButton
+                isLoading={isLoading}
+                loadingText="Loading"
+                label="Add"
+                onclick={() => {
                   console.log("check this method again", methods.getValues())
                 }}
-              >
-                Add
-              </Button>
+              />
             </DialogFooter>
           </form>
         </FormProvider>

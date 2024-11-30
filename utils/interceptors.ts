@@ -11,25 +11,32 @@ const excludeUrls = [
   "/auth/change-password",
   "/auth/renew-access",
   "/auth/logout",
+  "/saving-book/confirm-payment"
   
 ]
+const excludeResponseUrl = [
+  "/saving-book/confirm-payment"
+  
+]
+
 
 export const interceptorService = (store: AppDispatch) => {
   let requestCounter = 0
 
   axios.interceptors.request.use(
     (cfg) => {
+      requestCounter++
       const currentUrl =
         cfg.url?.replace(process.env.NEXT_PUBLIC_API_ENDPOINT || "", "") 
       if (currentUrl?.includes("/notification")) {
         return cfg
       }
-      requestCounter++
       store.dispatch(open())
       return cfg
     },
     (err) => {
       store.dispatch(close())
+      requestCounter--
       return Promise.reject(err)
     }
   )
@@ -37,7 +44,10 @@ export const interceptorService = (store: AppDispatch) => {
   axios.interceptors.response.use(
     (response) => {
       requestCounter--
-      store.dispatch(close())
+      if (!requestCounter) {
+        store.dispatch(close());
+      }
+      
 
       const currentUrl =
         response.config.url?.replace(
@@ -66,6 +76,7 @@ export const interceptorService = (store: AppDispatch) => {
                 description: "",
               })
             )
+            break
           case "delete":
             store.dispatch(
               success({
@@ -96,6 +107,19 @@ export const interceptorService = (store: AppDispatch) => {
               description: "",
             })
           )
+          resolve(err)
+        })
+      }
+
+
+      const currentUrl =
+      err.request.config?.url?.replace(
+        process.env.NEXT_PUBLIC_API_ENDPOINT || "",
+        ""
+      ) ?? ""
+
+      if (!excludeUrls.includes(currentUrl)) {
+        return new Promise((resolve, reject) => {
           resolve(err)
         })
       }

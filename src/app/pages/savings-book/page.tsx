@@ -9,41 +9,31 @@ import {
   List,
   MoreHorizontal,
   SplitSquareVertical,
+  WalletCards,
 } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table"
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip"
-import { CreateUpdateRegulationModal } from "@/components/pages/regulations/CreateUpdateRegulationModal"
+
 import { Metadata } from "@/app/interfaces/metadata"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { DataTable } from "@/components/common/datatable/Datatable"
 import Address, { ZodAddress } from "@/app/interfaces/common/address"
 import { CreateUpdateSavingBookModal } from "@/components/pages/savings-book/CreateUpdateSavingBookModal"
 import { useEffect } from "react"
-import { useSearchParams } from "next/navigation"
-
-const statusMap: Record<string, string> = {
-  init: "Waiting to complete payment",
-}
+import { usePathname, useRouter, useSearchParams } from "next/navigation"
+import proxyService from "../../../../utils/proxyService"
+import { useToast } from "@/hooks/use-toast"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
+import { Button } from "@/components/ui/button"
+import { Label } from "@/components/ui/label"
+import { Input } from "@/components/ui/input"
+import WithdrawSavingBookModal from "@/components/pages/savings-book/WithdrawSavingBookModal"
 
 export interface BookRegulation {
   regulationIdRef: string
@@ -65,10 +55,16 @@ export interface SavingBook extends AuditedEntity {
   paymentUrl: string
   balance: number
   pendingBalance: number
-  nextSchedule: Date
+  nextScheduleMonth: Date
   isActive: boolean
   newPaymentAmount: number
   term: number
+}
+
+const statusMap: Record<string, string> = {
+  init: "Waiting to complete payment",
+  active: "Actively",
+  expired: "Expired",
 }
 
 const columns: ColumnDef<SavingBook>[] = [
@@ -128,18 +124,39 @@ const columns: ColumnDef<SavingBook>[] = [
     },
   },
   {
+    accessorKey: "nextSchedule",
+    header: "Next Schedule Date",
+    cell: ({ row }) => {
+      const savingBook = row.original
+
+      return moment(savingBook.nextScheduleMonth).format("DD/MM/YYYY HH:mm:ss")
+    },
+  },
+  {
     header: "Action",
     cell: ({ row }) => {
       const savingBook = row.original
       return savingBook.pendingBalance !== 0 ? (
-        <div className="flex justify-center space-x-2 text-center cursor-pointer text-green-500"
+        <div
+          className="flex justify-center space-x-2 text-center cursor-pointer text-green-500"
           onClick={() => {
-            window.open(`${savingBook.paymentUrl}`,"_blank")
+            window.open(`${savingBook.paymentUrl}`, "_blank")
           }}
         >
-          <CreditCard  size={24} /> 
-          <span className="leading-6" >Paynow</span>
+          <CreditCard size={24} />
+          <span className="leading-6">Paynow</span>
         </div>
+      ) : (
+        ""
+      )
+    },
+  },
+  {
+    header: "Withdraw",
+    cell: ({ row }) => {
+      const savingBook = row.original
+      return savingBook.balance >= 0 && savingBook.status === "expired" ? (
+        <WithdrawSavingBookModal savingBook={savingBook} />
       ) : (
         ""
       )
@@ -203,10 +220,36 @@ const metadata: Metadata<SavingBook, SavingBookFormValues> = {
 }
 
 const SavingBookPage = () => {
-  const router = useSearchParams()
+  const params = useSearchParams()
+  const { toast } = useToast()
+  const router = useRouter()
+  const pathname = usePathname()
 
-  console.log(router.get("token"));
+  useEffect(() => {
+    const token = params.get("token")
+    if (token) {
+      postConfirmPayment(token)
+    }
+    console.log(params.get("token"))
+  }, [params])
 
+  const postConfirmPayment = async (token: string) => {
+    const res = await proxyService.post("/saving-book/confirm-payment", {
+      paymentId: token,
+    })
+    if (res.status === 200) {
+      toast({
+        title: "Payment Successful!",
+        variant: "success",
+        description:
+          " Thank you for your payment. Your transaction has been completed.",
+        duration: 1500,
+      })
+    } else {
+      console.log("check")
+    }
+    router.push(pathname)
+  }
 
   return (
     <div className="container mx-auto py-10">

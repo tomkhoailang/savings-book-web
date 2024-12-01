@@ -3,17 +3,17 @@ import { AppDispatch } from "@/app/reducers/store"
 import { error, success } from "@/app/reducers/toastReducer"
 import axios, { AxiosError } from "axios"
 
-const excludeUrls = [
-  "/auth/register",
-  "/auth/login",
-  "/auth/reset-password",
-  "/auth/confirm-reset-password",
-  "/auth/change-password",
-  "/auth/renew-access",
-  "/auth/logout",
-  "/saving-book/confirm-payment"
-  
-]
+
+const excludeUrls : Record<string, boolean> = {
+  "/auth/register" : true,
+  "/auth/login": true,
+  "/auth/reset-password": true,
+  "/auth/confirm-reset-password": true,
+  "/auth/change-password": true,
+  "/auth/renew-access": true,
+  "/auth/logout": true,
+  "/saving-book/confirm-payment": true
+}
 const excludeResponseUrl = [
   "/saving-book/confirm-payment"
   
@@ -55,7 +55,7 @@ export const interceptorService = (store: AppDispatch) => {
           ""
         ) ?? ""
 
-      if (!excludeUrls.includes(currentUrl)) {
+      if (!excludeUrls[currentUrl]) {
         switch (response.config.method) {
           case "put":
             store.dispatch(
@@ -97,6 +97,8 @@ export const interceptorService = (store: AppDispatch) => {
       requestCounter--
       store.dispatch(close())
 
+
+
       if (!err.response) {
         return new Promise((resolve, reject) => {
           store.dispatch(
@@ -112,13 +114,16 @@ export const interceptorService = (store: AppDispatch) => {
       }
 
 
+
       const currentUrl =
-      err.request.config?.url?.replace(
+      err.config?.url?.replace(
         process.env.NEXT_PUBLIC_API_ENDPOINT || "",
         ""
-      ) ?? ""
+        ) ?? ""
+      
 
-      if (!excludeUrls.includes(currentUrl)) {
+      if (excludeUrls[currentUrl]) {
+        console.log("not being hit");
         return new Promise((resolve, reject) => {
           resolve(err)
         })
@@ -127,10 +132,12 @@ export const interceptorService = (store: AppDispatch) => {
       const { status, statusText, request } = err.response
 
 
-      const mesasge = JSON.parse(request.response)
+      console.log(request);
+
 
       switch (status) {
         case 400:
+          const mesasge = JSON.parse(request?.response)
           return new Promise((resolve, reject) => {
             store.dispatch(
               error({

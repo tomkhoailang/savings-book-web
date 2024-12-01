@@ -19,6 +19,9 @@ import { ScrollArea } from "../ui/scroll-area"
 import { Button } from "@nextui-org/react"
 import moment from "moment"
 import { Skeleton } from "../ui/skeleton"
+import { useSelector } from "react-redux"
+import { RootState } from "@/app/reducers/store"
+import { WITH_DRAW_STATUS } from "../../../utils/socket.enum"
 export interface Notification extends AuditedEntity {
   userId: string
   message: string
@@ -32,10 +35,10 @@ const Notification = () => {
   const [paginate, setPaginate] = useState({ current: 1, size: 10 })
   const [totalCount, setTotalCount] = useState(0)
   const [loading, setLoading] = useState(false)
-  const authContext = useAuth()
-  const { toast } = useToast()
   const scrollAreaRef = useRef(null)
   const observerRef = useRef(null)
+  const socketReducer = useSelector((root: RootState) => root.socketReducer)
+  const {toast} = useToast()
 
   const fetchData = async () => {
     setLoading(true)
@@ -79,7 +82,8 @@ const Notification = () => {
     }
   }
   const onMarkAllAsRead = async () => {
-    if (data.filter((item) => item.isRead === true).length > 0) {
+
+    if (data.filter((item) => item.isRead === false).length > 0) {
       await proxyService.put(`/notification`, {})
 
       const nData = data.map((item) => {
@@ -122,20 +126,13 @@ const Notification = () => {
 
   useEffect(() => {
 
-    if (!authContext?.accessToken)  return
+    if (socketReducer.type === WITH_DRAW_STATUS) {
 
-    const wsUrl = `ws://localhost:44342/api/v1/ws?token=${authContext?.accessToken}`
-    const ws = new WebSocket(wsUrl)
+      console.log("new data", socketReducer.data);
+      
+      const newData = socketReducer.data as Notification
 
-    ws.onopen = () => {
-      console.log("WebSocket connection established")
-    }
-    ws.onmessage = (ev) => {
-      const jsonData = JSON.parse(ev.data)
-
-      if (jsonData.type === "WithDrawStatus") {
-        const newData: Notification = jsonData.data
-        setData((prev) => [newData, ...prev])
+      setData((prev) => [newData, ...prev])
         setTotalCount((prev) => prev + 1)
         toast({
           title: "Important Update!",
@@ -151,23 +148,12 @@ const Notification = () => {
             </ToastAction>
           ),
         })
-      }
     }
 
-    ws.onerror = (error) => {
-      console.error("WebSocket error:", error)
-      toast({
-        title: "WebSocket Error",
-        variant: "destructive",
-        description: "Failed to connect to notification server",
-        duration: 1500,
-      })
-    }
+   
 
-    return () => {
-      ws.close()
-    }
-  }, [authContext?.accessToken])
+   
+  }, [socketReducer])
 
   return (
     <div>

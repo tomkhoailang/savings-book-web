@@ -19,16 +19,38 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import Image from "next/image"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { ThemeToggle } from "../common/ThemeToggle"
 import { useAuth } from "@/app/contexts/authContext"
 import { useRouter } from "next/navigation"
 import { string } from "zod"
+import { SocketHelper } from "../../../utils/socketHelper.js"
+import { useDispatch } from "react-redux"
+import { setData } from "@/app/reducers/socketReducer"
 
 const SideBarLayout = () => {
   const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false)
   const authContext = useAuth()
   const router = useRouter()
+  const dispatch = useDispatch()
+
+  useEffect(() => {
+    if (typeof window !== undefined) {
+      const token = localStorage.getItem("accessToken")
+
+      if (token) {
+        SocketHelper.connect(
+          token,
+          SocketHelper.listenEvent((res: any) => {
+            dispatch(setData(res))
+          })
+        )
+      }
+    }
+    return () => {
+      SocketHelper.disconnect()
+    }
+  }, [])
 
   const onClickMenu = () => {
     setIsMenuOpen(!isMenuOpen)

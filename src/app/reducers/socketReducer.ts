@@ -4,7 +4,7 @@ import {createSlice} from "@reduxjs/toolkit"
 
 export interface SocketMessage {
   type: string,
-  data: {}
+  data: any
 }
 
 

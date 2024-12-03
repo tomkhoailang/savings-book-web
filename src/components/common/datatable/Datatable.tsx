@@ -82,6 +82,7 @@ export function DataTable<
   const datatableReducer = useSelector(
     (state: RootState) => state.datatableReducer
   )
+  const socketReducer = useSelector((state: RootState) => state.socketReducer)
 
   const [rowSelection, setRowSelection] = React.useState({})
   const [selectedRowForUpdate, setSelectedRowForUpdate] =
@@ -145,14 +146,14 @@ export function DataTable<
 
   const fetchData = async (url: string) => {
     const res = await proxyService.get(url)
-   
+
     const content = res.data
 
     if (res.status === 200) {
       setData((content.items as TData[]) ?? [])
       setTotalCount(content.totalCount)
       dispatch(updateTotalRow(content.totalCount))
-    } 
+    }
   }
   const whenUpdateClose = (resData: TData) => {
     const newData = data.map((item) => {
@@ -209,6 +210,24 @@ export function DataTable<
   useEffect(() => {
     setPageSize(datatableReducer.pagination.size)
   }, [datatableReducer.pagination.size])
+
+  useEffect(() => {
+    if (metadata.socket && socketReducer.type !== "") {
+      metadata.socket.map((socketProp) => {
+        if (socketProp.type === socketReducer.type) {
+          console.log("hitted", data, socketReducer);
+          
+          const updatedData = data.map((item) => {
+            if (item.id === socketReducer.data.data.id) {
+              return socketReducer.data.data
+            }
+            return item
+          })
+          setData(updatedData)
+        }
+      })
+    }
+  }, [socketReducer])
 
   const table = useReactTable({
     data,

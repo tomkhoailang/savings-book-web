@@ -1,2 +1,2 @@
 export const WITH_DRAW_STATUS = "WithDrawStatus"
-export const WITH_DRAW_COMPLETE = "WithDrawComplete"
+export const SAVING_BOOK_TRANSACTION_COMPLETE = "SavingBookTransactionComplete"

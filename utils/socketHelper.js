@@ -1,5 +1,5 @@
 "use client"
-import { WITH_DRAW_STATUS } from "./socket.enum"
+import {  SAVING_BOOK_TRANSACTION_COMPLETE, WITH_DRAW_COMPLETE } from "./socket.enum"
 
 let ws
 
@@ -23,8 +23,12 @@ const listenEvent = (callback) => {
   return () => {
     ws.onmessage = (ev) => {
       const jsonData = JSON.parse(ev.data)
-      if (jsonData.type === WITH_DRAW_STATUS) {
-        callback({ type: WITH_DRAW_STATUS, data: jsonData })
+      console.log("data coming", jsonData);
+      if (jsonData.type === SAVING_BOOK_TRANSACTION_COMPLETE) {
+        callback({ type: SAVING_BOOK_TRANSACTION_COMPLETE, data: jsonData })
+      }
+      if (jsonData.type === WITH_DRAW_COMPLETE) {
+        callback({ type: WITH_DRAW_COMPLETE, data: jsonData })
       }
     }
   }

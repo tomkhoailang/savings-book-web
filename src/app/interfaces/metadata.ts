@@ -1,5 +1,12 @@
 import { DefaultValues, FieldValues, Resolver } from "react-hook-form"
 
+
+export interface SocketType {
+  type: string,
+  handleData: (data: any) => any
+}
+
+
 export interface Metadata<
   TData extends AuditedEntity,
   TFormValues extends FieldValues
@@ -14,6 +21,7 @@ export interface Metadata<
     component: (data: TData | null) => React.ReactNode
     url: string
   }
+  socket?: SocketType[]
   deleteUrl: string,
   handleResponseData?: (data: TData) => void
   formSchema: Resolver<TFormValues>

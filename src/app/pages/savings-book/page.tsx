@@ -34,6 +34,7 @@ import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import WithdrawSavingBookModal from "@/components/pages/savings-book/WithdrawSavingBookModal"
+import { SAVING_BOOK_TRANSACTION_COMPLETE } from "../../../../utils/socket.enum"
 
 export interface BookRegulation {
   regulationIdRef: string
@@ -77,9 +78,9 @@ const columns: ColumnDef<SavingBook>[] = [
     cell: ({ row }) => {
       const savingBook = row.original
 
-      return `${savingBook.address.street ?? ""} ${
-        savingBook.address.city ?? ""
-      } ${savingBook.address.country ?? ""}`
+      return `${savingBook.address?.street ?? ""} ${
+        savingBook.address?.city ?? ""
+      } ${savingBook.address?.country ?? ""}`
     },
   },
   {
@@ -128,6 +129,10 @@ const columns: ColumnDef<SavingBook>[] = [
     header: "Next Schedule Date",
     cell: ({ row }) => {
       const savingBook = row.original
+
+      // if (moment(savingBook.nextScheduleMonth).isBefore(moment())) {
+      //   return ""
+      // }
 
       return moment(savingBook.nextScheduleMonth).format("DD/MM/YYYY HH:mm:ss")
     },
@@ -202,6 +207,12 @@ const metadata: Metadata<SavingBook, SavingBookFormValues> = {
     url: "/saving-book",
   },
   formSchema: zodResolver(SavingBookSchema),
+  socket: [{
+    type: SAVING_BOOK_TRANSACTION_COMPLETE,
+    handleData: (data: any) => {
+      return data
+    }
+  }], 
   getDefaultValue: (data) => {
     return {
       idCardNumber: data ? data.idCardNumber : "",

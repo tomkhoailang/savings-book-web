@@ -61,17 +61,20 @@ const SideBarLayout = () => {
 
   return (
     <>
-      <Menu
+      {/* <Menu
         size={40}
         className={`md:hidden h-12 cursor-pointer ${
           isMenuOpen ? "hidden" : ""
         }`}
         onClick={onClickMenu}
-      />
-      <div
+      /> */}
+      {/* <div
         className={`fixed inset-0 md:w-48 md:border-r-2  transition-transform duration-300 ease-in-out  ${
           isMenuOpen ? "translate-x-0" : "-translate-x-full"
         } md:translate-x-0`}
+      > */}
+        <div
+        className={`fixed inset-0 md:w-48 md:border-r-2  transition-transform duration-300 ease-in-out`}
       >
         <div className={`flex flex-col w-full h-full `}>
           <div className="h-24 w-full relative m-0">
@@ -82,13 +85,13 @@ const SideBarLayout = () => {
               height={1000}
               className="w-full h-full "
             ></Image>
-            <Button
+            {/* <Button
               variant="ghost"
               className="absolute top-0 right-0 text-cyan-950 md:hidden mt-2"
               onClick={onClickMenu}
             >
               <X size={24} />
-            </Button>
+            </Button> */}
           </div>
           <div className="sidebar-component flex flex-col gap-2 grow">
             <div className="parent-group  p-3 border-b-2 ">

@@ -7,15 +7,7 @@ import {
 } from "@/app/pages/regulations/page"
 import { Button } from "@/components/ui/button"
 
-import {
-  Table,
-  TableBody,
-  TableCaption,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table"
+import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 
 import { Input } from "@/components/ui/input"
 import { Controller, useForm, useFormContext } from "react-hook-form"
@@ -27,11 +19,7 @@ import { ScrollArea } from "../../ui/scroll-area"
 import proxyService from "../../../../utils/proxyService"
 import NumberInput from "@/components/common/NumberInput"
 
-export function CreateUpdateRegulationModal({
-  data,
-}: {
-  data: SavingRegulation | null
-}) {
+export function CreateUpdateRegulationModal({ data }: { data: SavingRegulation | null }) {
   const regulationForm = useFormContext<SavingRegulationFormValues>()
 
   const defaultSavingType: SavingType = {
@@ -40,9 +28,7 @@ export function CreateUpdateRegulationModal({
     term: 0,
   }
 
-  const [savingType, setSavingType] = useState<SavingTypeFormValues[]>(
-    data ? data.savingTypes : [defaultSavingType]
-  )
+  const [savingType, setSavingType] = useState<SavingTypeFormValues[]>(data ? data.savingTypes : [defaultSavingType])
   const [isOpen, setIsOpen] = useState(false)
 
   useEffect(() => {
@@ -52,29 +38,22 @@ export function CreateUpdateRegulationModal({
 
   const onAddSavingTypeBtn = () => {
     const lastSavingType = savingType.reduce((max, current) => {
-      return current.interestRate > max.interestRate ? current: max
+      return current.interestRate > max.interestRate ? current : max
     }, savingType[0])
 
     let newSavingType = {
-      interestRate: parseFloat(
-        (lastSavingType?.interestRate + 0.05).toFixed(2)
-      ),
+      interestRate: parseFloat((lastSavingType?.interestRate + 0.05).toFixed(2)),
       name: "",
       term: lastSavingType?.term + 1,
     }
 
     if (regulationForm.formState.errors.savingTypes) {
       newSavingType.term = 0
-      newSavingType.interestRate = parseFloat(
-        (lastSavingType?.interestRate - 0.01).toFixed(2)
-      )
+      newSavingType.interestRate = parseFloat((lastSavingType?.interestRate - 0.01).toFixed(2))
     }
 
     setSavingType([...savingType, newSavingType])
-    regulationForm.setValue(
-      `savingTypes[${savingType.length}]` as any,
-      newSavingType
-    )
+    regulationForm.setValue(`savingTypes[${savingType.length}]` as any, newSavingType)
   }
   const onRemoveSavingTypeBtn = (id: number) => {
     setSavingType(savingType.filter((type, index) => index !== id))
@@ -116,8 +95,7 @@ export function CreateUpdateRegulationModal({
           onClick={(e) => {
             e.preventDefault()
             onAddSavingTypeBtn()
-          }}
-        >
+          }}>
           <PlusCircle className="mr-2 h-4 w-4" /> Add Regulation
         </Button>
         <ScrollArea className="h-[250px]  mt-4">
@@ -179,9 +157,7 @@ export function CreateUpdateRegulationModal({
           </Table>
         </ScrollArea>
         {regulationForm.formState.errors.savingTypes?.message && (
-          <p className="text-red-500">
-            {regulationForm.formState.errors.savingTypes.message}
-          </p>
+          <p className="text-red-500">{regulationForm.formState.errors.savingTypes.message}</p>
         )}
       </div>
       <div className="flex mt-4">
@@ -191,11 +167,7 @@ export function CreateUpdateRegulationModal({
           render={({ field, fieldState }) => {
             return (
               <div className="flex flex-row space-x-2 justify-center items-center">
-                <Checkbox
-                  id="isActive"
-                  checked={field.value}
-                  onCheckedChange={field.onChange}
-                ></Checkbox>
+                <Checkbox id="isActive" checked={field.value} onCheckedChange={field.onChange}></Checkbox>
                 <div>Active</div>
               </div>
             )

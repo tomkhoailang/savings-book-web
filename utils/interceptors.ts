@@ -14,9 +14,9 @@ const excludeUrls : Record<string, boolean> = {
   "/auth/logout": true,
   "/saving-book/confirm-payment": true,
 }
-const excludeResponseUrl = [
-  "/saving-book/confirm-payment",
- 
+const excludeResponseUrlRegex = [
+  /^\/saving-book\/confirm-payment$/,
+  /\/saving-book\/[A-Za-z0-9]+\/withdraw-online/i,
   
 ]
 
@@ -55,12 +55,15 @@ export const interceptorService = (store: AppDispatch) => {
           process.env.NEXT_PUBLIC_API_ENDPOINT || "",
           ""
         ) ?? ""
-
       
-      const regex = /^\/notification\/.+$/
-      
-      if (regex.test(currentUrl)) {
+      const excludeUrlInline = "/notification"
+      if (currentUrl.includes(excludeUrlInline)) {
         return response
+      }
+      for (let regex of excludeResponseUrlRegex) {
+        if (regex.test(currentUrl)) {
+          return response
+        }
       }
       
       

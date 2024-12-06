@@ -56,6 +56,7 @@ const DropdownControl: React.FC<DropdownProps> = ({
               </Label>
             )}
 
+            <div className="mt-1">
             <Select
               value={field.value}
               onValueChange={(value) => {
@@ -78,6 +79,7 @@ const DropdownControl: React.FC<DropdownProps> = ({
                 })}
               </SelectContent>
             </Select>
+            </div>
 
             {error && (
               <p className="text-red-500 text-xs mt-1">{error.message}</p>

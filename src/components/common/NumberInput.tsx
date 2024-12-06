@@ -79,9 +79,7 @@ const NumberInput: React.FC<TextInputProps> = ({
                     if (max) {
                       numValue = numValue >= max ? max : numValue
                     }
-                    if (min) {
-                      numValue = numValue < min ? min : numValue
-                    }
+
 
                     field.onChange(numValue)
                     e.target.value = "0.1"
@@ -110,9 +108,6 @@ const NumberInput: React.FC<TextInputProps> = ({
                     numValue = numValue >= 0 ? numValue : 0
                     if (max) {
                       numValue = numValue >= max ? max : numValue
-                    }
-                    if (min) {
-                      numValue = numValue < min ? min : numValue
                     }
 
                     field.onChange(numValue)

@@ -31,14 +31,14 @@ export interface Notification extends AuditedEntity {
 }
 
 const Notification = () => {
-  const [data, setData] = useState<Notification[]>([])
+  const [notifications, setNotifications] = useState<Notification[]>([])
   const [paginate, setPaginate] = useState({ current: 1, size: 10 })
   const [totalCount, setTotalCount] = useState(0)
   const [loading, setLoading] = useState(false)
   const scrollAreaRef = useRef(null)
   const observerRef = useRef(null)
   const socketReducer = useSelector((root: RootState) => root.socketReducer)
-  const {toast} = useToast()
+  const { toast } = useToast()
 
   const fetchData = async () => {
     setLoading(true)
@@ -61,36 +61,38 @@ const Notification = () => {
 
       if (paginate.current !== 1) {
         const respNotifications = (content.items as Notification[]) ?? []
-        setData([...data, ...respNotifications])
+        setNotifications([...notifications, ...respNotifications])
       } else {
-        setData((content.items as Notification[]) ?? [])
+        setNotifications((content.items as Notification[]) ?? [])
       }
     }
   }
 
   const onMarkAsRead = async (notificationId: string | undefined) => {
+    console.log("check", notificationId)
     if (notificationId) {
       await proxyService.put(`/notification/${notificationId}`, {})
 
-      const nData = data.map((item) => {
-        if (item.id === notificationId) {
-          item.isRead = true
-        }
-        return item
-      })
-      setData(nData)
+      setNotifications((prev) =>
+        prev.map((item) => {
+          if (item.id === notificationId) {
+            return { ...item, isRead: true };
+          }
+          return item; 
+        })
+      );
+  
     }
   }
   const onMarkAllAsRead = async () => {
-
-    if (data.filter((item) => item.isRead === false).length > 0) {
+    if (notifications.filter((item) => item.isRead === false).length > 0) {
       await proxyService.put(`/notification`, {})
 
-      const nData = data.map((item) => {
+      const nData = notifications.map((item) => {
         item.isRead = true
         return item
       })
-      setData(nData)
+      setNotifications(nData)
     }
   }
 
@@ -125,42 +127,35 @@ const Notification = () => {
   }, [loading, paginate, totalCount])
 
   useEffect(() => {
-
     if (socketReducer.type === WITH_DRAW_STATUS) {
+      const newData = socketReducer.data.data as Notification
 
-      console.log("new data", socketReducer.data);
-      
-      const newData = socketReducer.data as Notification
-
-      setData((prev) => [newData, ...prev])
-        setTotalCount((prev) => prev + 1)
-        toast({
-          title: "Your withdraw request has been processed successfully!",
-          description: newData.message,
-          variant: "success",
-          action: (
-            <ToastAction
-              altText="Mark as read"
-              onClick={() => {
-                onMarkAsRead(newData.id)
-              }}
-            >
-              Mark as read
-            </ToastAction>
-          ),
-        })
+      setNotifications((prev) => [newData,...prev])
+      setTotalCount((prev) => prev + 1)
+      toast({
+        title: "Withdraw successfully!",
+        description: newData.message,
+        variant: "success",
+        action: (
+          <ToastAction
+            altText="Mark as read"
+            onClick={() => {
+              console.log("when wrong", newData.id)
+              onMarkAsRead(newData.id)
+            }}
+          >
+            Mark as read
+          </ToastAction>
+        ),
+      })
     }
-
-   
-
-   
   }, [socketReducer])
 
   return (
     <div>
       <Sheet>
         <SheetTrigger>
-          {data.filter((n) => !n.isRead).length > 0 ? (
+          {notifications.filter((n) => !n.isRead).length > 0 ? (
             <BellDot className="text-sm text-yellow-500" />
           ) : (
             <Bell className="text-sm" />
@@ -169,7 +164,7 @@ const Notification = () => {
         <SheetContent>
           <SheetTitle>Notification</SheetTitle>
           <SheetDescription className="text-sm mb-2">
-            You have {data.filter((n) => !n.isRead).length} unread messages
+            You have {notifications.filter((n) => !n.isRead).length} unread messages
           </SheetDescription>
           <div
             className="text-sm flex flex-row items-center cursor-pointer hover:text-blue-300"
@@ -183,7 +178,7 @@ const Notification = () => {
           <div className="h-5/6 w-full">
             <ScrollArea className="h-full" ref={scrollAreaRef}>
               <div className="py-4">
-                {data.map((notification, index) => (
+                {notifications.map((notification, index) => (
                   <div
                     key={index}
                     className="mb-4 grid grid-cols-[25px_1fr] items-start last:mb-0"

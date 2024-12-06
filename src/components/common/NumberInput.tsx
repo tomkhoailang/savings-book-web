@@ -67,15 +67,20 @@ const NumberInput: React.FC<TextInputProps> = ({
                 className={`${error ? "border-red-500" : ""} mt-1`}
                 step={step}
                 onChange={(e) => {
+                  console.log(1)
                   let inputValue = e.target.value
                   inputValue = inputValue.replace(/^0+/, "")
                   const regex = new RegExp(`^\\d*\\.?\\d{0,${decimalPoint}}$`)
                   if (regex.test(inputValue) || inputValue === "") {
-                    let numValue = inputValue === "" ? 0 : parseFloat(inputValue)
+                    let numValue =
+                      inputValue === "" ? 0 : parseFloat(inputValue)
 
                     numValue = numValue >= 0 ? numValue : 0
                     if (max) {
                       numValue = numValue >= max ? max : numValue
+                    }
+                    if (min) {
+                      numValue = numValue < min ? min : numValue
                     }
 
                     field.onChange(numValue)
@@ -100,14 +105,20 @@ const NumberInput: React.FC<TextInputProps> = ({
                   inputValue = inputValue.replace(/^0+/, "")
                   let numValue = inputValue === "" ? 0 : parseFloat(inputValue)
 
-                  numValue = numValue >= 0 ? numValue : 0
-                  if (max) {
-                    numValue = numValue >= max ? max : numValue
+                  const regex = new RegExp(`^\\d*\\.?\\d{0,${decimalPoint}}$`)
+                  if (regex.test(inputValue) || inputValue === "") {
+                    numValue = numValue >= 0 ? numValue : 0
+                    if (max) {
+                      numValue = numValue >= max ? max : numValue
+                    }
+                    if (min) {
+                      numValue = numValue < min ? min : numValue
+                    }
+
+                    field.onChange(numValue)
+                    e.target.value = "0.1"
                   }
 
-                  field.onChange(numValue)
-
-                  e.target.value = "0.1"
                   if (change && typeof change === "function") {
                     change()
                   }

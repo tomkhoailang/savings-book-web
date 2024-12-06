@@ -88,7 +88,7 @@ const columns: ColumnDef<SavingBook>[] = [
     cell: ({ row }) => {
       const savingBook = row.original
 
-      return `${savingBook.balance} $`
+      return `${Math.floor(savingBook.balance * 100) / 100} $`
     },
   },
   {
@@ -103,6 +103,20 @@ const columns: ColumnDef<SavingBook>[] = [
     header: "Status",
     cell: ({ row }) => {
       const savingBook = row.original
+
+      let latestAppliedReg
+
+      console.log(savingBook.regulations)
+      for (let i = savingBook.regulations.length - 1; i >= 0; i--) {
+        if (new Date(savingBook.regulations[i].applyDate) > new Date(0)) {
+          latestAppliedReg = savingBook.regulations[i]
+          break
+        }
+      }
+      if (latestAppliedReg && latestAppliedReg.termInMonth === 0) {
+        return "No term - Actively"
+      }
+
       return `${statusMap[savingBook.status]}`
     },
   },
@@ -145,7 +159,7 @@ const columns: ColumnDef<SavingBook>[] = [
         <div
           className="flex justify-center space-x-2 text-center cursor-pointer text-green-500"
           onClick={() => {
-            window.open(`${savingBook.paymentUrl}`, "_blank")
+            window.location.href = `${savingBook.paymentUrl}`
           }}
         >
           <CreditCard size={24} />
@@ -160,11 +174,41 @@ const columns: ColumnDef<SavingBook>[] = [
     header: "Withdraw",
     cell: ({ row }) => {
       const savingBook = row.original
-      return savingBook.balance >= 0 && savingBook.status === "expired" ? (
-        <WithdrawSavingBookModal savingBook={savingBook} />
-      ) : (
-        ""
-      )
+
+      let latestAppliedReg
+      for (let i = savingBook.regulations.length - 1; i >= 0; i--) {
+        if (new Date(savingBook.regulations[i].applyDate) > new Date(0)) {
+          latestAppliedReg = savingBook.regulations[i]
+          break
+        }
+      }
+
+      if (latestAppliedReg) {
+        if (
+          Math.floor(savingBook.balance * 100) / 100 <
+          latestAppliedReg.minWithDrawValue
+        ) {
+          return ""
+        }
+
+        if (savingBook.status === "expired") {
+          return <WithdrawSavingBookModal savingBook={savingBook} />
+        }
+
+        
+        const now = new Date();
+        console.log(now, new Date(latestAppliedReg.applyDate));
+        console.log(now.getTime(), new Date(latestAppliedReg.applyDate).getTime());
+        console.log(now.getTime() - new Date(latestAppliedReg.applyDate).getTime() );
+        if (
+          now.getTime() - new Date(latestAppliedReg.applyDate).getTime() >
+          latestAppliedReg.minWithDrawDay
+        ) {
+          return <WithdrawSavingBookModal savingBook={savingBook} />
+        }
+      }
+
+      return ""
     },
   },
 
@@ -207,12 +251,14 @@ const metadata: Metadata<SavingBook, SavingBookFormValues> = {
     url: "/saving-book",
   },
   formSchema: zodResolver(SavingBookSchema),
-  socket: [{
-    type: SAVING_BOOK_TRANSACTION_COMPLETE,
-    handleData: (data: any) => {
-      return data
-    }
-  }], 
+  socket: [
+    {
+      type: SAVING_BOOK_TRANSACTION_COMPLETE,
+      handleData: (data: any) => {
+        return data
+      },
+    },
+  ],
   getDefaultValue: (data) => {
     return {
       idCardNumber: data ? data.idCardNumber : "",

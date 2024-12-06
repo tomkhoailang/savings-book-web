@@ -12,10 +12,11 @@ const excludeUrls : Record<string, boolean> = {
   "/auth/change-password": true,
   "/auth/renew-access": true,
   "/auth/logout": true,
-  "/saving-book/confirm-payment": true
+  "/saving-book/confirm-payment": true,
 }
 const excludeResponseUrl = [
-  "/saving-book/confirm-payment"
+  "/saving-book/confirm-payment",
+ 
   
 ]
 
@@ -55,6 +56,14 @@ export const interceptorService = (store: AppDispatch) => {
           ""
         ) ?? ""
 
+      
+      const regex = /^\/notification\/.+$/
+      
+      if (regex.test(currentUrl)) {
+        return response
+      }
+      
+      
       if (!excludeUrls[currentUrl]) {
         switch (response.config.method) {
           case "put":
@@ -97,7 +106,7 @@ export const interceptorService = (store: AppDispatch) => {
       requestCounter--
       store.dispatch(close())
 
-
+      
 
       if (!err.response) {
         return new Promise((resolve, reject) => {

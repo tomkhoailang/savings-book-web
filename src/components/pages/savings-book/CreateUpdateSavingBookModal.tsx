@@ -33,6 +33,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import DropdownControl from "@/components/common/DropdownControl"
+import NumberInput from "@/components/common/NumberInput"
 
 interface SavingType {
   name: string
@@ -81,6 +82,13 @@ export function CreateUpdateSavingBookModal({
 
   return (
     <>
+      <div>Our regulation
+        <div>
+          Min withdraw day: <span className="font-bold">{latestRegulation.minWithdrawDay} days</span>
+          <br/>
+          Min deposit value: <span className="font-bold">{latestRegulation.minWithdrawValue }$</span>
+        </div>
+      </div>
       <div className="flex flex-row justify-between space-x-5">
         <TextInput
           control={savingBookForm.control}
@@ -91,15 +99,16 @@ export function CreateUpdateSavingBookModal({
           maxlength={12}
           required
         />
-        <TextInput
+        <NumberInput
           control={savingBookForm.control}
           name="newPaymentAmount"
           label="Balance"
-          number
           defaultValue={latestRegulation.minWithdrawValue}
           placeholder="Balance"
           className=" w-1/2"
           required
+          decimalPoint={0}
+          min={latestRegulation.minWithdrawValue}
 
         />
       </div>

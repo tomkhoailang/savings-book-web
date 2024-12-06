@@ -88,9 +88,25 @@ const WithdrawSavingBookModal = ({
           <DialogHeader>
             <DialogTitle>Withdraw</DialogTitle>
             <DialogDescription>
-              The value couldn't not exceed
-              <span className="font-bold"> {savingBook.balance}$ </span>
-              which is your current balance
+              Current balance:
+              <span className="font-bold">
+                {" "}
+                {Math.floor(savingBook.balance * 100) / 100}${" "}
+              </span>
+              <div>
+                The minimum value for withdraw is{" "}
+                <span className="font-bold">
+                  {" "}
+                  {latestAppliedReg.minWithDrawValue}${" "}
+                </span>
+                <div>
+                The minimum day to withdraw is {" "}
+                <span className="font-bold">
+                  {" "}
+                  {latestAppliedReg.minWithDrawDay}
+                </span>
+                </div>
+              </div>
             </DialogDescription>
           </DialogHeader>
           <FormProvider {...withdrawForm}>

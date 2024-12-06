@@ -135,8 +135,9 @@ const Notification = () => {
       setData((prev) => [newData, ...prev])
         setTotalCount((prev) => prev + 1)
         toast({
-          title: "Important Update!",
+          title: "Your withdraw request has been processed successfully!",
           description: newData.message,
+          variant: "success",
           action: (
             <ToastAction
               altText="Mark as read"

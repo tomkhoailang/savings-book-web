@@ -156,9 +156,9 @@ const Notification = () => {
       <Sheet>
         <SheetTrigger>
           {notifications.filter((n) => !n.isRead).length > 0 ? (
-            <BellDot className="text-sm text-yellow-500" />
+            <BellDot className="text-sm text-yellow-500"  size={20} />
           ) : (
-            <Bell className="text-sm" />
+            <Bell className="text-sm" size={20} />
           )}
         </SheetTrigger>
         <SheetContent>

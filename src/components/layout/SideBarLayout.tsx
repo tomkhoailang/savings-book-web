@@ -108,7 +108,7 @@ const SideBarLayout = () => {
                 onClick={() => onSidebarItemClick("/savings-book")}
               >
                 <BedSingle size={20} className="text-xs" />
-                <div>Saving Book List</div>
+                <div>Saving Books</div>
               </div>
               <div
                 className="text-sm flex flex-row space-x-2 items-center cursor-pointer"
@@ -117,13 +117,13 @@ const SideBarLayout = () => {
                 <BedSingle size={20} className="text-xs" />
                 <div>Regulations</div>
               </div>
-              <div className="text-sm flex flex-row space-x-2 items-center">
+              <div className="text-sm flex flex-row space-x-2 items-center cursor-pointer" onClick={() => onSidebarItemClick("/transaction-tickets")} >
                 <BedSingle size={20} className="text-xs" />
-                <div>Lập phiếu gửi tiền</div>
+                <div>Transaction Tickets</div>
               </div>
               <div className="text-sm flex flex-row space-x-2 items-center">
                 <BedSingle size={20} className="text-xs" />
-                <div>Lập phiếu rút tiền</div>
+                <div>zod</div>
               </div>
             </div>
             <div className="parent-group  p-3 border-b-2 space-y-2  ">

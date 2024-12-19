@@ -188,9 +188,7 @@ const metadata: Metadata<SavingRegulation, SavingRegulationFormValues> = {
 
 const RegulationPage = () => {
   return (
-    <div className="container mx-auto py-10">
-      <DataTable columns={columns} metadata={metadata} />
-    </div>
+    <DataTable columns={columns} metadata={metadata} />
   )
 }
 

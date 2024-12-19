@@ -22,8 +22,8 @@ export interface Metadata<
     url: string
   }
   socket?: SocketType[]
-  deleteUrl: string,
+  deleteUrl?: string,
   handleResponseData?: (data: TData) => void
-  formSchema: Resolver<TFormValues>
-  getDefaultValue: (data: TData | null) => DefaultValues<TFormValues>
+  formSchema?: Resolver<TFormValues>
+  getDefaultValue?: (data: TData | null) => DefaultValues<TFormValues>
 }

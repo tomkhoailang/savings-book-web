@@ -77,7 +77,7 @@ export function DataTable<
   TData extends AuditedEntity,
   TValue,
   TFormValues extends FieldValues
->({ columns, metadata }: DataTableProps<TData, TValue, TFormValues>) {
+  >({ columns, metadata }: DataTableProps<TData, TValue, TFormValues>) {
   const dispatch = useDispatch()
   const datatableReducer = useSelector(
     (state: RootState) => state.datatableReducer
@@ -268,58 +268,56 @@ export function DataTable<
             </Badge>
           </div>
           <div className="space-x-5 flex flex-row justify-center">
-            <Button
+            {metadata.create && <Button
               className="bg-green-600 rounded-lg"
               onClick={() => {
                 setIsCreateModalOpen(true)
               }}
             >
               Create
-            </Button>
+            </Button>}
 
-            {metadata.deleteUrl !== "" ? (
+            {metadata.deleteUrl && (
               <AlertDialog open={isDeleteModalOpen}>
-                <Button
-                  className="bg-red-500 rounded-lg"
-                  onClick={() => {
-                    setIsDeleteModalOpen(true)
-                  }}
-                  disabled={
-                    table.getFilteredSelectedRowModel().rows.length === 0
-                  }
-                >
-                  Delete
-                </Button>
-                <AlertDialogContent>
-                  <AlertDialogHeader>
-                    <AlertDialogTitle>
-                      Are you absolutely sure?
-                    </AlertDialogTitle>
-                    <AlertDialogDescription>
-                      This action cannot be undone. This will permanently delete
-                      current data from our servers.
-                    </AlertDialogDescription>
-                  </AlertDialogHeader>
-                  <AlertDialogFooter>
-                    <AlertDialogCancel
-                      onClick={() => {
-                        setIsDeleteModalOpen(false)
-                      }}
-                    >
-                      Cancel
-                    </AlertDialogCancel>
-                    <AlertDialogAction
-                      onClick={() => {
-                        handleDelete()
-                      }}
-                    >
-                      Continue
-                    </AlertDialogAction>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog>
-            ) : (
-              ""
+              <Button
+                className="bg-red-500 rounded-lg"
+                onClick={() => {
+                  setIsDeleteModalOpen(true)
+                }}
+                disabled={
+                  table.getFilteredSelectedRowModel().rows.length === 0
+                }
+              >
+                Delete
+              </Button>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>
+                    Are you absolutely sure?
+                  </AlertDialogTitle>
+                  <AlertDialogDescription>
+                    This action cannot be undone. This will permanently delete
+                    current data from our servers.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel
+                    onClick={() => {
+                      setIsDeleteModalOpen(false)
+                    }}
+                  >
+                    Cancel
+                  </AlertDialogCancel>
+                  <AlertDialogAction
+                    onClick={() => {
+                      handleDelete()
+                    }}
+                  >
+                    Continue
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
             )}
           </div>
         </Card>
@@ -464,7 +462,7 @@ export function DataTable<
         </div>
       </div>
 
-      {metadata.update !== null ? (
+      {metadata.update && (
         <UpdateModal
           metadata={metadata}
           isOpen={isUpdateModalOpen}
@@ -472,10 +470,8 @@ export function DataTable<
           dataSource={selectedRowForUpdate}
           whenClose={whenUpdateClose}
         />
-      ) : (
-        ""
-      )}
-      {metadata.create !== null ? (
+      ) }
+      {metadata.create && (
         <CreateModal
           metadata={metadata}
           isOpen={isCreateModalOpen}
@@ -483,9 +479,7 @@ export function DataTable<
           dataSource={null}
           whenClose={whenCreateClose}
         />
-      ) : (
-        ""
-      )}
+      ) }
     </div>
   )
 }

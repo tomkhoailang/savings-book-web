@@ -29,7 +29,6 @@ export interface SavingRegulation extends AuditedEntity {
   minWithdrawValue: number
   savingTypes: SavingType[]
   minWithdrawDay: number
-  isActive: boolean
 }
 
 const columns: ColumnDef<SavingRegulation>[] = [

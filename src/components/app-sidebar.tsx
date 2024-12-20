@@ -76,22 +76,15 @@ const data = {
       ],
     },
     {
-      title: "Models",
+      title: "System",
       url: "#",
       icon: Bot,
       items: [
         {
-          title: "Genesis",
-          url: "#",
+          title: "User",
+          url: "user-manager/users",
         },
-        {
-          title: "Explorer",
-          url: "#",
-        },
-        {
-          title: "Quantum",
-          url: "#",
-        },
+       
       ],
     }
   ],

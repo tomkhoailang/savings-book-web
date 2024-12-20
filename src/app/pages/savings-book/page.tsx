@@ -44,6 +44,7 @@ export interface SavingBook extends AuditedEntity {
   pendingBalance: number
   nextScheduleMonth: Date
   isActive: boolean
+  totalEarnings: number
   newPaymentAmount: number
   term: number
 }
@@ -82,6 +83,14 @@ const columns: ColumnDef<SavingBook>[] = [
       const savingBook = row.original
 
       return `${savingBook.pendingBalance} $`
+    },
+  },
+  {
+    header: "Total Earnings",
+    cell: ({ row }) => {
+      const savingBook = row.original
+
+      return `${Math.floor(savingBook.totalEarnings * 100) / 100} $`
     },
   },
   {

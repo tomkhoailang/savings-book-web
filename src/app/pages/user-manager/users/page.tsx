@@ -1,156 +1,102 @@
 "use client"
+import moment from "moment"
+import { z } from "zod"
+import { ColumnDef } from "@tanstack/react-table"
+import { Checkbox } from "@/components/ui/checkbox"
+import { Check, List, MoreHorizontal, Shield, ShieldBan } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import { CreateUpdateRegulationModal } from "@/components/pages/regulations/CreateUpdateRegulationModal"
+import { Metadata } from "@/app/interfaces/metadata"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { DataTable } from "@/components/common/datatable/Datatable"
+import { Fragment, useState } from "react"
+import { AlertDialogHeader, AlertDialogFooter } from "@/components/ui/alert-dialog"
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogCancel,
+  AlertDialogAction,
+} from "@radix-ui/react-alert-dialog"
+import { table } from "console"
+import LoadingButton from "@/components/common/LoadingButton"
+import { DialogHeader, DialogFooter, DialogDescription, DialogTrigger } from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogTitle } from "@radix-ui/react-dialog"
+import { FormProvider } from "react-hook-form"
+import ConfirmBanModal from "@/components/pages/user/ConfirmBanModal"
 
-import React, { useState } from "react";
-import {Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Pagination, getKeyValue} from "@nextui-org/react";
-
-
-
-const rows = [
-  {
-    key: "1",
-    username: "user1",
-    name: "Tony Reichert",
-    idnumber: "123456754321",
-    email: "user1@gmail.com",
-  },
-  {
-    key: "2",
-    username: "user2",
-    name: "Mark Hummer",
-    idnumber: "840937227483",
-    email: "user2@gmail.com",
-  },
-  {
-    key: "3",
-    username: "user3",
-    name: "David Tom",
-    idnumber: "537826382644",
-    email: "user3@gmail.com",
-  },
-  {
-    key: "4",
-    username: "user4",
-    name: "Chris Smith",
-    idnumber: "352678677390",
-    email: "user4@gmail.com",
-  },
-];
-
-const columns = [
-  {
-    key: "username",
-    label: "USERNAME",
-  },
-  {
-    key: "name",
-    label: "NAME",
-  },
-  {
-    key: "idnumber",
-    label: "ID CARD NUMBER",
-  },
-  {
-    key: "email",
-    label: "EMAIL",
-  },
-  {
-    key: "setting",
-    label: "",
-  },
-];
-
-export default function App() {
-  const [hover, setHover] = useState(false);
-
-  const buttonStyle = {
-    backgroundColor: hover ? "#FFFFFF" : "transparent",
-    border: "none",
-    cursor: "pointer",
-    padding: "5px",
-    borderRadius: "5px",
-  };
-  
-  const [page, setPage] = React.useState(1);
-  const rowsPerPage = 4;
-
-  const pages = Math.ceil(rows.length / rowsPerPage);
-
-  const items = React.useMemo(() => {
-    const start = (page - 1) * rowsPerPage;
-    const end = start + rowsPerPage;
-
-    return rows.slice(start, end);
-  }, [page, rows]);
-
-  return (
-    <Table 
-      aria-label="Example table with client side pagination"
-      bottomContent={
-        <div className="flex w-full justify-center">
-          <Pagination
-            isCompact
-            showControls
-            showShadow
-            color="secondary"
-            page={page}
-            total={pages}
-            onChange={(page) => setPage(page)}
-          />
-        </div>}
-         classNames={{
-          wrapper: "min-h-[222px]",
-        }}>
-      
-      <TableHeader columns={columns}>
-        {(column) => <TableColumn key={column.key}>{column.label}</TableColumn>}
-      </TableHeader>
-      <TableBody items={items}>
-        {(item) => (
-         <TableRow key={item.key}>
-         {(columnKey) =>
-           columnKey === "setting" ? (
-             <TableCell style={{ textAlign: "center" }}>
-              <button 
-                style={buttonStyle}
-                onMouseEnter={() => setHover(true)}
-                onMouseLeave={() => setHover(false)}
-                >
-                <img 
-                  src="https://img.icons8.com/ios-glyphs/30/FFFFFF/visible.png"
-                  alt="view"
-                  style={{ width: "20px", height: "20px"}}/>
-               </button>
-               <button
-                style={buttonStyle}
-                onMouseEnter={() => setHover(true)}
-                onMouseLeave={() => setHover(false)}
-                >
-                <img 
-                  src="https://img.icons8.com/ios-glyphs/30/FFFFFF/edit.png"
-                  alt="edit"
-                  style={{ width: "20px", height: "20px"}}/>
-               </button>
-               <button
-                style={buttonStyle}
-                onMouseEnter={() => setHover(true)}
-                onMouseLeave={() => setHover(false)}
-                >
-                <img
-                  src="https://img.icons8.com/ios-glyphs/30/FFFFFF/trash.png"
-                  alt="edit"
-                  style={{ width: "20px", height: "20px"}}/>
-                  
-               </button>
-             </TableCell>
-           ) : (
-             <TableCell style={{ textAlign: "center" }}>{getKeyValue(item, columnKey)}</TableCell>
-           )
-         }
-       </TableRow>
-        )}
-      </TableBody>
-    </Table>
-  );
+export interface User extends AuditedEntity {
+  username: string
+  email: string
 }
 
+const UserSchema = z.object({})
 
+export type UserFormValues = z.infer<typeof UserSchema>
+
+const metadata: Metadata<User, UserFormValues> = {
+  getUrl: "/user",
+  selectMultipleRow: true,
+}
+
+const UserPage = () => {
+  const columns: ColumnDef<User>[] = [
+    {
+      accessorKey: "username",
+      header: "Username",
+    },
+    {
+      accessorKey: "email",
+      header: "Email",
+    },
+    {
+      cell: ({ row }) => {
+        const regulation = row.original
+        if (regulation.isActive) {
+          return <Check className="text-green-400 w-full" />
+        }
+      },
+      header: "Active",
+    },
+    {
+      accessorKey: "creationTime",
+      header: "Creation Time",
+      cell: ({ row }) => {
+        const regulation = row.original
+
+        return moment(regulation.creationTime).format("DD/MM/YYYY HH:mm:ss")
+      },
+    },
+    {
+      header: "Action",
+      cell: ({ row }) => {
+        return (
+          <div className="flex justify-center ">
+            <ConfirmBanModal user={row.original}/>
+          </div>
+        )
+      },
+    },
+  ]
+
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
+
+  return (
+    <Fragment>
+      <DataTable columns={columns} metadata={metadata} />
+    </Fragment>
+  )
+}
+
+export default UserPage

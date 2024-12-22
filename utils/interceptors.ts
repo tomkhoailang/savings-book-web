@@ -109,8 +109,6 @@ export const interceptorService = (store: AppDispatch) => {
       requestCounter--
       store.dispatch(close())
 
-      
-
       if (!err.response) {
         return new Promise((resolve, reject) => {
           store.dispatch(
@@ -134,12 +132,11 @@ export const interceptorService = (store: AppDispatch) => {
         ) ?? ""
       
 
-      if (excludeUrls[currentUrl]) {
-        console.log("not being hit");
-        return new Promise((resolve, reject) => {
-          resolve(err)
-        })
-      }
+      // if (excludeUrls[currentUrl]) {
+      //   return new Promise((resolve, reject) => {
+      //     resolve(err)
+      //   })
+      // }
 
       const { status, statusText, request } = err.response
 

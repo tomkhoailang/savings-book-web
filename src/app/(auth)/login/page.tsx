@@ -153,7 +153,7 @@ const Login = () => {
     if (res.status === 200 || res.status === 201) {
       toast({
         title: "Sign up complete",
-        variant: "default",
+        variant: "success",
         description: "Your account is created successfully",
         duration: 1500,
         className:
@@ -181,7 +181,7 @@ const Login = () => {
         duration: 1500,
       })
       authContext?.login(loginContent.access_token, loginContent.refresh_token)
-    }
+    } 
     setLoading(false)
   }
 

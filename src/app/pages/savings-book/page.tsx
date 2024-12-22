@@ -90,7 +90,9 @@ const columns: ColumnDef<SavingBook>[] = [
     cell: ({ row }) => {
       const savingBook = row.original
 
-      return `${Math.floor(savingBook.totalEarnings * 100) / 100} $`
+      if(savingBook.totalEarnings)
+        return `${Math.floor(savingBook.totalEarnings * 100) / 100} $`
+      return ""
     },
   },
   {
@@ -168,6 +170,9 @@ const columns: ColumnDef<SavingBook>[] = [
     cell: ({ row }) => {
       const savingBook = row.original
 
+      if (savingBook.paymentUrl !== "")
+        return ""
+
       let latestAppliedReg
       for (let i = savingBook.regulations.length - 1; i >= 0; i--) {
         if (new Date(savingBook.regulations[i].applyDate) > new Date(0)) {
@@ -243,8 +248,11 @@ const metadata: Metadata<SavingBook, SavingBookFormValues> = {
   socket: [
     {
       type: SAVING_BOOK_TRANSACTION_COMPLETE,
-      handleData: (data: any) => {
-        return data
+      handleData: (oldData: any, data: any) => {
+        return {
+          ...data,
+          totalEarnings: oldData.totalEarnings
+        }
       },
     },
   ],

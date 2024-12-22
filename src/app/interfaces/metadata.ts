@@ -3,7 +3,7 @@ import { DefaultValues, FieldValues, Resolver } from "react-hook-form"
 
 export interface SocketType {
   type: string,
-  handleData: (data: any) => any
+  handleData: (oldData: any, newData: any) => any
 }
 
 

@@ -25,8 +25,9 @@ import {
   SidebarHeader,
   SidebarRail,
 } from "@/components/ui/sidebar"
+import { useAuth } from "@/app/contexts/authContext"
+import { useRouter } from "next/navigation"
 
-// This is sample data.
 const data = {
   user: {
     name: "shadcn",
@@ -49,6 +50,13 @@ const data = {
       logo: Command,
       plan: "Free",
     },
+  ],
+  projects: [
+    {
+      name: "Dashboard",
+      url: "dashboard",
+      icon: Frame,
+    }
   ],
   navMain: [
     {
@@ -97,6 +105,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <TeamSwitcher teams={data.teams} />
       </SidebarHeader>
       <SidebarContent>
+        <NavProjects projects={data.projects} />
         <NavMain items={data.navMain} />
       </SidebarContent>
       <SidebarFooter>

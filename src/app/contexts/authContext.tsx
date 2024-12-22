@@ -60,7 +60,6 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
   }
   const logout = async () => {
 
-
     setAccessToken(null)
     setRefreshToken(null)
     setCurrentUser(null)

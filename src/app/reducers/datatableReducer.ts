@@ -1,4 +1,4 @@
-import {createSlice} from "@reduxjs/toolkit"
+import { createSlice } from "@reduxjs/toolkit"
 
 const initialState = {
   totalCount: 0,
@@ -10,9 +10,7 @@ const initialState = {
 const buildQuery = (pagination: any) => {
   let query = "?"
   if (pagination) {
-    query += `Skip=${(pagination.current - 1) * pagination.size}&Max=${
-      pagination.size
-    }`
+    query += `Skip=${(pagination.current - 1) * pagination.size}&Max=${pagination.size}`
   }
   return query
 }
@@ -25,12 +23,15 @@ const datatableSlice = createSlice({
       state.totalCount = action.payload
     },
     pageChange: (state, action) => {
-      console.log(action);
       state.pagination = action.payload
+      state.query = buildQuery(state.pagination)
+    },
+    reset: (state) => {
+      state.pagination = { current: 1, size: 25 }
       state.query = buildQuery(state.pagination)
     },
   },
 })
 
-export const { updateTotalRow, pageChange } = datatableSlice.actions
+export const { updateTotalRow, pageChange, reset } = datatableSlice.actions
 export default datatableSlice.reducer

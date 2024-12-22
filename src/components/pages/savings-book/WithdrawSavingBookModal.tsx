@@ -20,8 +20,10 @@ import { useState } from "react"
 import proxyService from "../../../../utils/proxyService"
 import LoadingButton from "@/components/common/LoadingButton"
 import NumberInput from "@/components/common/NumberInput"
+import { useToast } from "@/hooks/use-toast"
 
 const WithdrawSavingBookModal = ({ savingBook }: { savingBook: SavingBook }) => {
+  const { toast } = useToast()
   const latestAppliedReg = savingBook.regulations.reduce((max, cur) => {
     return new Date(max.applyDate) > new Date(cur.applyDate) ? max : cur
   }, savingBook.regulations[0])
@@ -54,7 +56,13 @@ const WithdrawSavingBookModal = ({ savingBook }: { savingBook: SavingBook }) => 
     setIsLoading(true)
     const res = await proxyService.post(`/saving-book/${savingBook.id}/withdraw-online `, data)
     const content = res.data
-    if (res.status === 200 || res.status === 201) {
+    if (res.status === 200) {
+      toast({
+        title: "Info",
+        variant: "success",
+        description: "Your withdraw request is being processed",
+        duration: 1000,
+      })
       setOpen(false)
     } else {
     }
@@ -114,7 +122,9 @@ const WithdrawSavingBookModal = ({ savingBook }: { savingBook: SavingBook }) => 
                   />
                 </div>
                 {latestAppliedReg.termInMonth !== 0 && (
-                  <span className="text-yellow-300">Since your regulation isn't demand term. You can only withdraw all your balance this time</span>
+                  <span className="text-yellow-300">
+                    Since your regulation isn't demand term. You can only withdraw all your balance this time
+                  </span>
                 )}
               </div>
               <DialogFooter>

@@ -4,6 +4,7 @@ import { Button } from "../ui/button";
 import { useSelector } from "react-redux";
 import { RootState } from "@/app/reducers/store";
 import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 const ToastBar = () => {
   const { toast } = useToast()

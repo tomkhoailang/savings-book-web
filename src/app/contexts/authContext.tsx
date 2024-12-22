@@ -1,15 +1,10 @@
 "use client"
-import React, {
-  createContext,
-  ReactNode,
-  useContext,
-  useEffect,
-  useState,
-} from "react"
+import React, { createContext, ReactNode, useContext, useEffect, useState } from "react"
 
 import { jwtDecode } from "jwt-decode"
 import axios from "axios"
 import proxyService from "../../../utils/proxyService"
+import { useRouter } from "next/navigation"
 
 interface AuthUser {
   username: string
@@ -34,6 +29,7 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
   const [refreshToken, setRefreshToken] = useState<string | null>(null)
   const [currentUser, setCurrentUser] = useState<AuthUser | null>(null)
   const [loading, setLoading] = useState(true)
+  const router = useRouter()
 
   useEffect(() => {
     const storedAccessToken = localStorage.getItem("accessToken")
@@ -59,25 +55,19 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
     setCurrentUser(jwtDecode<AuthUser>(accessToken))
   }
   const logout = async () => {
-
+    await proxyService.post("/auth/logout")
     setAccessToken(null)
     setRefreshToken(null)
     setCurrentUser(null)
-
-    await proxyService.post("/auth/logout")
-
     localStorage.removeItem("accessToken")
     localStorage.removeItem("refreshToken")
     localStorage.removeItem("currentUser")
-
-
+    
+    router.push("/login")
   }
-  
 
   return (
-    <AuthContext.Provider
-      value={{ accessToken, refreshToken, currentUser, login, logout, loading }}
-    >
+    <AuthContext.Provider value={{ accessToken, refreshToken, currentUser, login, logout, loading }}>
       {children}
     </AuthContext.Provider>
   )

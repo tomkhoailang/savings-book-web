@@ -114,9 +114,8 @@ export function NavUser({
             <DropdownMenuSeparator />
             <DropdownMenuItem
               onClick={() => {
-                console.log("trigger")
                 authContext?.logout()
-                router.push("/login")
+                // router.push("/login")
               }}>
               <LogOut />
               Log out

@@ -184,7 +184,7 @@ const SideBarLayout = () => {
                   <span
                     onClick={() => {
                       authContext?.logout()
-                      router.push("/login")
+                      // router.push("/login")
                     }}
                   >
                     Log out

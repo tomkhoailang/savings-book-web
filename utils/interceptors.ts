@@ -17,6 +17,7 @@ const excludeUrls : Record<string, boolean> = {
 const excludeResponseUrlRegex = [
   /^\/saving-book\/confirm-payment$/,
   /\/saving-book\/[A-Za-z0-9]+\/withdraw-online/i,
+  /^\/notification\$/
   
 ]
 

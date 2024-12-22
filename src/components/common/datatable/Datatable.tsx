@@ -112,12 +112,12 @@ export function DataTable<TData extends AuditedEntity, TValue, TFormValues exten
   const [data, setData] = React.useState<TData[]>([])
   const [totalCount, setTotalCount] = React.useState(0)
   const path = usePathname()
-  const pathRef = useRef(0)
+  const pathRef = useRef(true)
 
   useEffect(() => {
-    pathRef.current = 0
-    fetchData(metadata.getUrl)
+    pathRef.current = true
     dispatch(reset())
+    fetchData(metadata.getUrl)
   }, [path])
 
   const fetchData = async (url: string) => {
@@ -189,8 +189,8 @@ export function DataTable<TData extends AuditedEntity, TValue, TFormValues exten
   // }, [memoizedQuery])
 
   useEffect(() => {
-    if (pathRef.current < 2) {
-      pathRef.current += 1
+    if (pathRef.current ) {
+      pathRef.current = false
       return
     }
     fetchData(metadata.getUrl + memoizedQuery)

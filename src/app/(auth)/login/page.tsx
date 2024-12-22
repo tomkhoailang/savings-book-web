@@ -92,7 +92,7 @@ const Login = () => {
 
   useEffect(() => {
     if (typeof window !== "undefined" && authContext?.accessToken !== null) {
-      router.push("/pages/dashboard")
+      router.push("/pages/savings-book")
     }
   }, [authContext])
 

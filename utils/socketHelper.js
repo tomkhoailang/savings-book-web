@@ -18,7 +18,7 @@ const connect = (token, callback) => {
   }
 }
 const disconnect = () => {
-  ws.close()
+  ws?.close()
 }
 const listenEvent = (callback) => {
   return () => {

@@ -3,9 +3,8 @@ import { AppDispatch } from "@/app/reducers/store"
 import { error, success } from "@/app/reducers/toastReducer"
 import axios, { AxiosError } from "axios"
 
-
-const excludeUrls : Record<string, boolean> = {
-  "/auth/register" : true,
+const excludeUrls: Record<string, boolean> = {
+  "/auth/register": true,
   "/auth/login": true,
   "/auth/reset-password": true,
   "/auth/confirm-reset-password": true,
@@ -17,10 +16,9 @@ const excludeUrls : Record<string, boolean> = {
 const excludeResponseUrlRegex = [
   /^\/saving-book\/confirm-payment$/,
   /\/saving-book\/[A-Za-z0-9]+\/withdraw-online/i,
-  /^\/notification\$/
-  
+  /^\/notification\$/,
+  /^\/auth\/logout$/,
 ]
-
 
 export const interceptorService = (store: AppDispatch) => {
   let requestCounter = 0
@@ -28,8 +26,7 @@ export const interceptorService = (store: AppDispatch) => {
   axios.interceptors.request.use(
     (cfg) => {
       requestCounter++
-      const currentUrl =
-        cfg.url?.replace(process.env.NEXT_PUBLIC_API_ENDPOINT || "", "") 
+      const currentUrl = cfg.url?.replace(process.env.NEXT_PUBLIC_API_ENDPOINT || "", "")
       if (currentUrl?.includes("/notification")) {
         return cfg
       }
@@ -47,16 +44,11 @@ export const interceptorService = (store: AppDispatch) => {
     (response) => {
       requestCounter--
       if (!requestCounter) {
-        store.dispatch(close());
+        store.dispatch(close())
       }
-      
 
-      const currentUrl =
-        response.config.url?.replace(
-          process.env.NEXT_PUBLIC_API_ENDPOINT || "",
-          ""
-        ) ?? ""
-      
+      const currentUrl = response.config.url?.replace(process.env.NEXT_PUBLIC_API_ENDPOINT || "", "") ?? ""
+
       const excludeUrlInline = "/notification"
       if (currentUrl.includes(excludeUrlInline)) {
         return response
@@ -66,8 +58,7 @@ export const interceptorService = (store: AppDispatch) => {
           return response
         }
       }
-      
-      
+
       if (!excludeUrls[currentUrl]) {
         switch (response.config.method) {
           case "put":
@@ -124,26 +115,19 @@ export const interceptorService = (store: AppDispatch) => {
         })
       }
 
+      const currentUrl = err.config?.url?.replace(process.env.NEXT_PUBLIC_API_ENDPOINT || "", "") ?? ""
 
-
-      const currentUrl =
-      err.config?.url?.replace(
-        process.env.NEXT_PUBLIC_API_ENDPOINT || "",
-        ""
-        ) ?? ""
-      
-
-      // if (excludeUrls[currentUrl]) {
-      //   return new Promise((resolve, reject) => {
-      //     resolve(err)
-      //   })
-      // }
+      for (let regex of excludeResponseUrlRegex) {
+        if (regex.test(currentUrl)) {
+          return new Promise((resolve, reject) => {
+            resolve(err)
+          })
+        }
+      }
 
       const { status, statusText, request } = err.response
 
-
-      console.log(request);
-
+      console.log(request)
 
       switch (status) {
         case 400:
@@ -168,8 +152,7 @@ export const interceptorService = (store: AppDispatch) => {
               error({
                 variant: "destructive",
                 title: "Unauthorized",
-                message:
-                  "You don't have enough permission to perform this action",
+                message: "You don't have enough permission to perform this action",
                 description: "",
               })
             )

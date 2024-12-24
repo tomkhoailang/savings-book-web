@@ -3,24 +3,44 @@ import moment from "moment"
 import { z } from "zod"
 import { ColumnDef } from "@tanstack/react-table"
 import { Checkbox } from "@/components/ui/checkbox"
-import { Check, CreditCard, List, MoreHorizontal, SplitSquareVertical, WalletCards } from "lucide-react"
+import {
+  ChartArea,
+  Check,
+  CreditCard,
+  History,
+  LandPlot,
+  List,
+  MoreHorizontal,
+  SplitSquareVertical,
+  Ticket,
+  WalletCards,
+} from "lucide-react"
 
 import { Metadata } from "@/app/interfaces/metadata"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { DataTable } from "@/components/common/datatable/Datatable"
 import Address, { ZodAddress } from "@/app/interfaces/common/address"
 import { CreateUpdateSavingBookModal } from "@/components/pages/savings-book/CreateUpdateSavingBookModal"
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import proxyService from "../../../../utils/proxyService"
 import { useToast } from "@/hooks/use-toast"
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import WithdrawSavingBookModal from "@/components/pages/savings-book/WithdrawSavingBookModal"
 import { SAVING_BOOK_TRANSACTION_COMPLETE } from "../../../../utils/socket.enum"
 import DepositSavingBookModal from "@/components/pages/savings-book/DepositSavingBookModal"
+import TransactionHistoryPopUp from "@/components/pages/savings-book/TransactionHistory"
 
 export interface BookRegulation {
   regulationIdRef: string
@@ -66,7 +86,9 @@ const columns: ColumnDef<SavingBook>[] = [
     cell: ({ row }) => {
       const savingBook = row.original
 
-      return `${savingBook.address?.street ?? ""} ${savingBook.address?.city ?? ""} ${savingBook.address?.country ?? ""}`
+      return `${savingBook.address?.street ?? ""} ${
+        savingBook.address?.city ?? ""
+      } ${savingBook.address?.country ?? ""}`
     },
   },
   {
@@ -90,7 +112,7 @@ const columns: ColumnDef<SavingBook>[] = [
     cell: ({ row }) => {
       const savingBook = row.original
 
-      if(savingBook.totalEarnings)
+      if (savingBook.totalEarnings)
         return `${Math.floor(savingBook.totalEarnings * 100) / 100} $`
       return ""
     },
@@ -108,7 +130,11 @@ const columns: ColumnDef<SavingBook>[] = [
           break
         }
       }
-      if (latestAppliedReg && latestAppliedReg.termInMonth === 0 && savingBook.balance > 0) {
+      if (
+        latestAppliedReg &&
+        latestAppliedReg.termInMonth === 0 &&
+        savingBook.balance > 0
+      ) {
         return `No term - ${statusMap[savingBook.status]}`
       }
 
@@ -140,11 +166,22 @@ const columns: ColumnDef<SavingBook>[] = [
       const savingBook = row.original
       console.log(savingBook.balance)
 
-      if (moment(savingBook.nextScheduleMonth).isBefore(moment()) || savingBook.balance === 0) {
+      if (
+        moment(savingBook.nextScheduleMonth).isBefore(moment()) ||
+        savingBook.balance === 0
+      ) {
         return ""
       }
 
       return moment(savingBook.nextScheduleMonth).format("DD/MM/YYYY HH:mm:ss")
+    },
+  },
+  {
+    header: "History",
+    cell: ({ row }) => {
+      const savingBook = row.original
+
+      return <TransactionHistoryPopUp bookID={savingBook.accountId} />
     },
   },
   {
@@ -156,12 +193,28 @@ const columns: ColumnDef<SavingBook>[] = [
           className="flex justify-center space-x-2 text-center cursor-pointer text-green-500"
           onClick={() => {
             window.location.href = `${savingBook.paymentUrl}`
-          }}>
+          }}
+        >
           <CreditCard size={24} />
           <span className="leading-6">Paynow</span>
         </div>
       ) : (
-        ""
+        <div>
+          <div
+            className="flex justify-center space-x-2 text-center cursor-pointer text-green-500"
+            onClick={() => {}}
+          >
+            <History size={24} />
+            <span className="leading-6">Transaction History</span>
+          </div>
+          <div
+            className="flex justify-center space-x-2 text-center cursor-pointer text-green-500"
+            onClick={() => {}}
+          >
+            <ChartArea size={24} />
+            <span className="leading-6">Monthly Interests</span>
+          </div>
+        </div>
       )
     },
   },
@@ -170,8 +223,7 @@ const columns: ColumnDef<SavingBook>[] = [
     cell: ({ row }) => {
       const savingBook = row.original
 
-      if (savingBook.paymentUrl !== "")
-        return ""
+      if (savingBook.paymentUrl !== "") return ""
 
       let latestAppliedReg
       for (let i = savingBook.regulations.length - 1; i >= 0; i--) {
@@ -182,52 +234,52 @@ const columns: ColumnDef<SavingBook>[] = [
       }
 
       if (latestAppliedReg) {
-        if (Math.floor(savingBook.balance * 100) / 100 < latestAppliedReg.minWithDrawValue) {
+        if (
+          Math.floor(savingBook.balance * 100) / 100 <
+          latestAppliedReg.minWithDrawValue
+        ) {
           return ""
         }
 
         if (savingBook.status === "expired") {
-
-          return <div className="flex flex-row space-x-2">
-            <WithdrawSavingBookModal savingBook={savingBook} />
-            <DepositSavingBookModal savingBook={savingBook} />
-          </div>
+          return (
+            <div className="flex flex-row space-x-2">
+              <WithdrawSavingBookModal savingBook={savingBook} />
+              <DepositSavingBookModal savingBook={savingBook} />
+            </div>
+          )
         }
 
         const now = new Date()
         const applyDate = new Date(latestAppliedReg.applyDate)
 
-        if (Math.floor((now.getTime() - applyDate.getTime()) / 1000) > latestAppliedReg.minWithDrawDay && latestAppliedReg.termInMonth === 0) {
-          return  <div className="flex flex-row space-x-2">
-          <WithdrawSavingBookModal savingBook={savingBook} />
-          {savingBook.paymentUrl === "" && <DepositSavingBookModal savingBook={savingBook} />}
-        </div>
+        if (
+          Math.floor((now.getTime() - applyDate.getTime()) / 1000) >
+            latestAppliedReg.minWithDrawDay &&
+          latestAppliedReg.termInMonth === 0
+        ) {
+          return (
+            <div className="flex flex-row space-x-2">
+              <WithdrawSavingBookModal savingBook={savingBook} />
+              {savingBook.paymentUrl === "" && (
+                <DepositSavingBookModal savingBook={savingBook} />
+              )}
+            </div>
+          )
         }
       }
 
       return ""
     },
   },
-
-  // {
-  //   accessorKey: "lastModificationTime",
-  //   cell: ({ row }) => {
-  //     const savingBook = row.original
-
-  //     if (new Date(savingBook.lastModificationTime).getFullYear() === 1) {
-  //       return ""
-  //     }
-  //     return moment(savingBook.lastModificationTime).format(
-  //       "DD/MM/YYYY HH:mm:ss"
-  //     )
-  //   },
-  //   header: "Last Modification Time",
-  // }
 ]
 
 const SavingBookSchema = z.object({
   address: ZodAddress,
-  idCardNumber: z.string().min(9, { message: "Id card number must be at least 9 character" }).max(12, { message: "Id card number cannot exceeds 12 characters" }),
+  idCardNumber: z
+    .string()
+    .min(9, { message: "Id card number must be at least 9 character" })
+    .max(12, { message: "Id card number cannot exceeds 12 characters" }),
   term: z.number(),
   newPaymentAmount: z.number(),
 })
@@ -251,7 +303,7 @@ const metadata: Metadata<SavingBook, SavingBookFormValues> = {
       handleData: (oldData: any, data: any) => {
         return {
           ...data,
-          totalEarnings: oldData.totalEarnings
+          totalEarnings: oldData.totalEarnings,
         }
       },
     },
@@ -279,6 +331,8 @@ const SavingBookPage = () => {
   const router = useRouter()
   const pathname = usePathname()
 
+  const [isPopupOpen, setIsPopupOpen] = useState(false)
+
   useEffect(() => {
     const token = params.get("token")
     if (token) {
@@ -295,7 +349,8 @@ const SavingBookPage = () => {
       toast({
         title: "Payment Successful!",
         variant: "success",
-        description: " Thank you for your payment. Your transaction has been completed.",
+        description:
+          " Thank you for your payment. Your transaction has been completed.",
         duration: 1500,
       })
     } else {
@@ -304,9 +359,7 @@ const SavingBookPage = () => {
     router.push(pathname)
   }
 
-  return (
-    <DataTable columns={columns} metadata={metadata} />
-  )
+  return <DataTable columns={columns} metadata={metadata} />
 }
 
 export default SavingBookPage

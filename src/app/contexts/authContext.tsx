@@ -11,6 +11,7 @@ interface AuthUser {
   userId: string
   roles: string[]
   exp: number
+  email: string
 }
 
 type AuthContextType = {
@@ -49,7 +50,7 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
   const login = (accessToken: string, refreshToken: string) => {
     localStorage.setItem("accessToken", accessToken)
     localStorage.setItem("refreshToken", refreshToken)
-
+    console.log("asfd", jwtDecode<AuthUser>(accessToken))
     setAccessToken(accessToken)
     setRefreshToken(refreshToken)
     setCurrentUser(jwtDecode<AuthUser>(accessToken))
@@ -62,12 +63,14 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
     localStorage.removeItem("accessToken")
     localStorage.removeItem("refreshToken")
     localStorage.removeItem("currentUser")
-    
+
     router.push("/login")
   }
 
   return (
-    <AuthContext.Provider value={{ accessToken, refreshToken, currentUser, login, logout, loading }}>
+    <AuthContext.Provider
+      value={{ accessToken, refreshToken, currentUser, login, logout, loading }}
+    >
       {children}
     </AuthContext.Provider>
   )

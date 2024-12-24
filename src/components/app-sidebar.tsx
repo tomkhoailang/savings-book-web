@@ -21,7 +21,6 @@ import { TeamSwitcher } from "@/components/team-switcher"
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarRail } from "@/components/ui/sidebar"
 import { useAuth } from "@/app/contexts/authContext"
 import { useRouter } from "next/navigation"
-
 const data = {
   user: {
     name: "shadcn",
@@ -126,6 +125,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const [isAdmin, setIsAdmin] = React.useState(false)
 
   React.useEffect(() => {
+    if (authContext?.currentUser != null) {
+      data.user.name = authContext.currentUser.username.toString()
+      console.log(authContext)
+    }
+
     if (authContext?.currentUser?.roles.includes("Admin")) {
       setIsAdmin(true)
     } else {

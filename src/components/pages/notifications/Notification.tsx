@@ -50,6 +50,7 @@ import { DataTable } from "@/components/common/datatable/Datatable"
 import { DataTablePopup } from "@/components/common/datatable/DatatablePopup"
 import React from "react"
 import proxyService from "../../../../utils/proxyService"
+import { Notification } from "@/components/common/Notification"
 
 const transactionTypeDict: Record<string, string> = {
   deposit: "Deposit",
@@ -69,7 +70,7 @@ export interface TransactionTicket extends AuditedEntity {
 
   paymentLink: string
   paymentType: string
-  paymentId: string
+  creatorId: string
   paymentAmount: number
 }
 
@@ -79,7 +80,7 @@ export type TransactionTicketFormValues = z.infer<
   typeof TransactionTicketSchema
 >
 
-const NotificationPopUp = ({ ticketID }: { ticketID: any }) => {
+const NotificationPopUp = ({ ticketID }: { ticketID: Notification }) => {
   const [data, setData] = React.useState<TransactionTicket>()
   const [open, setOpen] = useState(false)
 
@@ -89,57 +90,59 @@ const NotificationPopUp = ({ ticketID }: { ticketID: any }) => {
     const content = res.data
 
     if (res.status === 200) {
-      setData(content.result)
+      setData(content)
     }
   }
   useEffect(() => {
-    fetchData("/transaction-ticket/" + ticketID)
+    if (open) fetchData("/transaction-ticket/" + ticketID.transactionTicketId)
   }, [open])
   console.log("data", data)
 
   return (
-    <div className="flex justify-center space-x-2 text-center cursor-pointer text-green-500">
+    <div className="flex flex-col space-x-2  cursor-pointer text-green-500">
+      {ticketID.message}
+
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogTrigger asChild>
           <Button variant="outline">
-            {" "}
-            <Mail /> <span>Read</span>
+            <span>View Details</span>
           </Button>
         </DialogTrigger>
 
-        <DialogContent className="sm:max-w-[480px]">
+        <DialogContent className="sm:max-w-[900px]">
           <DialogHeader>
             <DialogTitle>Transaction Detail</DialogTitle>
             <DialogDescription></DialogDescription>
           </DialogHeader>
           <DialogDescription>
-            Payment ID:
-            <span className="font-bold"> {data?.paymentId}</span>
-            <br />
-            Email:
-            <span className="font-bold"> {data?.email}</span>
-            <br />
-            Payment Amount:
-            <span className="font-bold"> {data?.paymentAmount}$</span>
-            <br />
-            Payment Type:
-            <span className="font-bold">
-              {" "}
-              {transactionTypeDict[data?.paymentType ?? ""] || "Unknown"}
-            </span>
-            <br />
-            Transaction Result:
-            <span className="font-bold">
-              {" "}
-              {transactionStatusDict[data?.status ?? ""] || "Unknown"}
-            </span>
-            <br />
-            Creation Time:
-            <span className="font-bold">
-              {" "}
-              {moment(data?.creationTime).format("DD/MM/YYYY HH:mm:ss")}
-            </span>
-            <br />
+            <div className="grid grid-cols-2 gap-x-8 gap-y-4 ">
+              <div>
+                <span className="text-gray-600">Transaction Time:</span>
+                <span className="font-bold ml-2">
+                  {moment(data?.creationTime).format("DD/MM/YYYY HH:mm:ss")}
+                </span>
+              </div>
+              <div>
+                <span className="text-gray-600">Email:</span>
+                <span className="font-bold ml-2">{data?.email}</span>
+              </div>
+              <div>
+                <span className="text-gray-600">Payment Amount:</span>
+                <span className="font-bold ml-2">{data?.paymentAmount}$</span>
+              </div>
+              <div>
+                <span className="text-gray-600">Payment Type:</span>
+                <span className="font-bold ml-2">
+                  {transactionTypeDict[data?.paymentType ?? ""] || "Unknown"}
+                </span>
+              </div>
+              <div>
+                <span className="text-gray-600">Transaction Result:</span>
+                <span className="font-bold ml-2">
+                  {transactionStatusDict[data?.status ?? ""] || "Unknown"}
+                </span>
+              </div>
+            </div>
           </DialogDescription>
         </DialogContent>
       </Dialog>

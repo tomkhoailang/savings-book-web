@@ -25,6 +25,7 @@ interface TextInputProps {
   change?: any
   min?: number
   max?: number
+  disable?: boolean
 }
 
 const NumberInput: React.FC<TextInputProps> = ({
@@ -41,6 +42,7 @@ const NumberInput: React.FC<TextInputProps> = ({
   change,
   min,
   max,
+  disable = false,
 }) => {
   return (
     <Controller
@@ -62,6 +64,7 @@ const NumberInput: React.FC<TextInputProps> = ({
                 type="number"
                 min={min}
                 max={max}
+                disabled={disable}
                 placeholder={placeholder}
                 {...field}
                 className={`${error ? "border-red-500" : ""} mt-1`}
@@ -79,7 +82,6 @@ const NumberInput: React.FC<TextInputProps> = ({
                     if (max) {
                       numValue = numValue >= max ? max : numValue
                     }
-
 
                     field.onChange(numValue)
                     e.target.value = "0.1"

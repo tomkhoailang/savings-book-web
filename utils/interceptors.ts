@@ -18,6 +18,7 @@ const excludeResponseUrlRegex = [
   /\/saving-book\/[A-Za-z0-9]+\/withdraw-online/i,
   /^\/notification\$/,
   /^\/auth\/logout$/,
+  /^\/auth\/confirm-reset-password$/,
 ]
 
 export const interceptorService = (store: AppDispatch) => {
@@ -26,7 +27,10 @@ export const interceptorService = (store: AppDispatch) => {
   axios.interceptors.request.use(
     (cfg) => {
       requestCounter++
-      const currentUrl = cfg.url?.replace(process.env.NEXT_PUBLIC_API_ENDPOINT || "", "")
+      const currentUrl = cfg.url?.replace(
+        process.env.NEXT_PUBLIC_API_ENDPOINT || "",
+        ""
+      )
       if (currentUrl?.includes("/notification")) {
         return cfg
       }
@@ -47,10 +51,17 @@ export const interceptorService = (store: AppDispatch) => {
         store.dispatch(close())
       }
 
-      const currentUrl = response.config.url?.replace(process.env.NEXT_PUBLIC_API_ENDPOINT || "", "") ?? ""
+      const currentUrl =
+        response.config.url?.replace(
+          process.env.NEXT_PUBLIC_API_ENDPOINT || "",
+          ""
+        ) ?? ""
 
       const excludeUrlInline = "/notification"
-      if (currentUrl.includes(excludeUrlInline)) {
+      if (
+        currentUrl.includes(excludeUrlInline) ||
+        currentUrl.includes("auth/confirm-reset-password?token")
+      ) {
         return response
       }
       for (let regex of excludeResponseUrlRegex) {
@@ -115,7 +126,11 @@ export const interceptorService = (store: AppDispatch) => {
         })
       }
 
-      const currentUrl = err.config?.url?.replace(process.env.NEXT_PUBLIC_API_ENDPOINT || "", "") ?? ""
+      const currentUrl =
+        err.config?.url?.replace(
+          process.env.NEXT_PUBLIC_API_ENDPOINT || "",
+          ""
+        ) ?? ""
 
       for (let regex of excludeResponseUrlRegex) {
         if (regex.test(currentUrl)) {
@@ -126,8 +141,6 @@ export const interceptorService = (store: AppDispatch) => {
       }
 
       const { status, statusText, request } = err.response
-
-      console.log(request)
 
       switch (status) {
         case 400:
@@ -152,6 +165,19 @@ export const interceptorService = (store: AppDispatch) => {
                 title: "Unauthorized",
                 message:
                   "You don't have enough permission to perform this action",
+                description: "",
+              })
+            )
+            resolve(err)
+          })
+        case 404:
+          const mesasge1 = JSON.parse(request?.response)
+          return new Promise((resolve, reject) => {
+            store.dispatch(
+              error({
+                variant: "destructive",
+                title: "Not found",
+                message: mesasge1.message,
                 description: "",
               })
             )

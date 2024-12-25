@@ -6,7 +6,7 @@ import axios from "axios"
 import proxyService from "../../../utils/proxyService"
 import { useRouter } from "next/navigation"
 
-interface AuthUser {
+export interface AuthUser {
   username: string
   userId: string
   roles: string[]

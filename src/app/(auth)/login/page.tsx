@@ -133,7 +133,7 @@ const Login = () => {
     if (res.status === 200 || res.status === 201) {
       toast({
         title: "Success",
-        variant: "default",
+        variant: "success",
         description: "An email is sent to your register mail",
         duration: 1500,
         className:

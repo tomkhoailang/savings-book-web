@@ -84,12 +84,22 @@ const WithdrawSavingBookModal = ({ savingBook }: { savingBook: SavingBook }) => 
             <DialogTitle>Withdraw</DialogTitle>
             <DialogDescription>
               Current balance:
-              <span className="font-bold"> {Math.floor(savingBook.balance * 100) / 100}$ </span>
+              <span className="font-bold">
+                {" "}
+                {Math.floor(savingBook.balance * 100) / 100}${" "}
+              </span>
               <br />
               The minimum value for withdraw is{" "}
-              <span className="font-bold"> {latestAppliedReg.minWithDrawValue}$ </span>
+              <span className="font-bold">
+                {" "}
+                {latestAppliedReg.minWithDrawValue}${" "}
+              </span>
               <br />
-              The minimum day to withdraw is <span className="font-bold"> {latestAppliedReg.minWithDrawDay}</span>
+              The minimum day to withdraw is{" "}
+              <span className="font-bold">
+                {" "}
+                {latestAppliedReg.minWithDrawDay}
+              </span>
               <br />
             </DialogDescription>
           </DialogHeader>
@@ -116,6 +126,7 @@ const WithdrawSavingBookModal = ({ savingBook }: { savingBook: SavingBook }) => 
                     className="w-full"
                     name="amount"
                     decimalPoint={2}
+                    disable={latestAppliedReg.termInMonth !== 0}
                     min={latestAppliedReg.minWithDrawValue}
                     max={Math.floor(maxWithdrawValue * 100) / 100}
                     step={0.01}
@@ -123,7 +134,8 @@ const WithdrawSavingBookModal = ({ savingBook }: { savingBook: SavingBook }) => 
                 </div>
                 {latestAppliedReg.termInMonth !== 0 && (
                   <span className="text-yellow-300">
-                    Since your regulation isn't demand term. You can only withdraw all your balance this time
+                    Since your regulation isn't demand term. You can only
+                    withdraw all your balance this time
                   </span>
                 )}
               </div>
@@ -133,7 +145,11 @@ const WithdrawSavingBookModal = ({ savingBook }: { savingBook: SavingBook }) => 
                   loadingText="Loading"
                   label="Withdraw"
                   onclick={() => {
-                    console.log("check this method again", withdrawForm.getValues(), withdrawForm.formState.errors)
+                    console.log(
+                      "check this method again",
+                      withdrawForm.getValues(),
+                      withdrawForm.formState.errors
+                    )
                   }}
                 />
               </DialogFooter>

@@ -189,15 +189,9 @@ const Notification = () => {
                       }`}
                     />
                     <div className="space-y-1">
-                      <p className="text-sm font-medium leading-none">
-                        {notification.message}
-                      </p>
                       <NotificationPopUp
-                        ticketID={notification.transactionTicketId}
-                      />
-                      <p className="text-sm text-muted-foreground">
-                        Reference: {notification.transactionTicketId}
-                      </p>
+                        ticketID={notification}
+                      ></NotificationPopUp>
                       <p className="text-sm text-muted-foreground">
                         {moment(notification.creationTime).fromNow()}
                       </p>

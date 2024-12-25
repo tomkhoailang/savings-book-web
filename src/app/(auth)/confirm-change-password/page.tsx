@@ -74,11 +74,20 @@ const ResetPassword = () => {
     )
     console.log(res)
     const content: ErrorResponse = res.data
+    console.log(content)
+
     if (res.status >= 400) {
+      toast({
+        title: "Error",
+        variant: "destructive",
+        description: content.error,
+        duration: 1500,
+        className: "top-0 right-0 fixed md:max-w-[420px] md:top-4 md:right-4",
+      })
     } else {
       toast({
         title: "Reset password complete",
-        variant: "success",
+        variant: "default",
         description: "Your password is reset",
         duration: 1500,
         className:

@@ -67,6 +67,7 @@ import CreateModal from "./CreateModal"
 import UpdateModal from "./UpdateModal"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Card } from "@/components/ui/card"
+import { useAuth } from "@/app/contexts/authContext"
 
 interface DataTableProps<
   TData extends AuditedEntity,
@@ -87,6 +88,7 @@ export function DataTable<
     (state: RootState) => state.datatableReducer
   )
   const socketReducer = useSelector((state: RootState) => state.socketReducer)
+  const authContext = useAuth()
 
   const [rowSelection, setRowSelection] = React.useState({})
   const [selectedRowForUpdate, setSelectedRowForUpdate] =
@@ -292,7 +294,7 @@ export function DataTable<
             </Badge>
           </div>
           <div className="space-x-5 flex flex-row justify-center">
-            {metadata.create && (
+            {!authContext?.currentUser?.roles.includes("Admin") && metadata.create && (
               <Button
                 className="bg-green-600 rounded-lg"
                 onClick={() => {

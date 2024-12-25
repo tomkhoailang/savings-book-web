@@ -50,10 +50,6 @@ export interface MonthlyInterestOutput extends AuditedEntity {
 
 const columns: ColumnDef<MonthlyInterestOutput>[] = [
   {
-    accessorKey: "savingBookId",
-    header: "Saving Book",
-  },
-  {
     accessorKey: "interestRate",
     header: "InterestRate",
   },

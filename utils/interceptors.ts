@@ -106,7 +106,7 @@ export const interceptorService = (store: AppDispatch) => {
           store.dispatch(
             error({
               variant: "destructive",
-              title: "Something really bad happen",
+              title: "Network error",
               message: "Check this out",
               description: "",
             })
@@ -127,11 +127,11 @@ export const interceptorService = (store: AppDispatch) => {
 
       const { status, statusText, request } = err.response
 
-      console.log(request)
 
       switch (status) {
         case 400:
           const mesasge = JSON.parse(request?.response)
+          console.log(mesasge);
           return new Promise((resolve, reject) => {
             store.dispatch(
               error({

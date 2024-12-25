@@ -35,24 +35,26 @@ export default function UpdateModal<
 
   const methods = useForm<TFormValues>({
     resolver: metadata.formSchema,
-    defaultValues: metadata.getDefaultValue(dataSource),
+    defaultValues: metadata.getDefaultValue?.(dataSource),
   })
 
   useEffect(() => {
     if (isOpen) {
-      methods.reset(metadata.getDefaultValue(dataSource))
+      methods.reset(metadata.getDefaultValue?.(dataSource))
     }
   }, [dataSource, isOpen])
 
   const onSubmit = async (data: TFormValues) => {
     if (dataSource) {
-      const res = await proxyService.put(`${metadata.update?.url}/${dataSource.id}`, data)
+      const res = await proxyService.put(
+        `${metadata.update?.url}/${dataSource.id}`,
+        data
+      )
       if (res.status === 200 || res.status === 201) {
         const content = res.data
         setIsOpen(!isOpen)
         whenClose(content)
       }
-     
     }
   }
 

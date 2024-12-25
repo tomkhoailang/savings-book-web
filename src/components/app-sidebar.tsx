@@ -111,10 +111,6 @@ const dataUser = {
           title: "Transaction Tickets",
           url: "transaction-tickets",
         },
-        {
-          title: "Monthly Interests",
-          url: "monthly-interests",
-        },
       ],
     },
   ],

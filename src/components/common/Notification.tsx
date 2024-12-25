@@ -2,8 +2,14 @@
 
 import { useCallback, useEffect, useRef, useState } from "react"
 import { useRouter } from "next/navigation"
-import { Bell, BellDot, BellIcon, Check } from "lucide-react"
-import { Sheet, SheetContent, SheetDescription, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
+import { Bell, BellDot, BellIcon, Check, Mail } from "lucide-react"
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet"
 import { Switch } from "@/components/ui/switch"
 import { useToast } from "@/hooks/use-toast"
 import { useAuth } from "@/app/contexts/authContext"
@@ -16,6 +22,7 @@ import { Skeleton } from "../ui/skeleton"
 import { useSelector } from "react-redux"
 import { RootState } from "@/app/reducers/store"
 import { WITH_DRAW_STATUS } from "../../../utils/socket.enum"
+import NotificationPopUp from "../pages/notifications/Notification"
 export interface Notification extends AuditedEntity {
   userId: string
   message: string
@@ -40,7 +47,9 @@ const Notification = () => {
     await new Promise((resolve) => setTimeout(resolve, 1000))
 
     const res = await proxyService.get(
-      `/notification?Skip=${(paginate.current - 1) * paginate.size}&Max=${paginate.size}`
+      `/notification?Skip=${(paginate.current - 1) * paginate.size}&Max=${
+        paginate.size
+      }`
     )
 
     const content = res.data
@@ -100,7 +109,10 @@ const Notification = () => {
     if (paginate.current !== 1 && observerRef.current) {
       const observer = new IntersectionObserver(
         (entries) => {
-          if (entries[0].isIntersecting && totalCount - paginate.current * paginate.size > 0) {
+          if (
+            entries[0].isIntersecting &&
+            totalCount - paginate.current * paginate.size > 0
+          ) {
             onLoadMore()
           }
         },
@@ -129,7 +141,8 @@ const Notification = () => {
             onClick={() => {
               console.log("when wrong", newData.id)
               onMarkAsRead(newData.id)
-            }}>
+            }}
+          >
             Mark as read
           </ToastAction>
         ),
@@ -150,13 +163,15 @@ const Notification = () => {
         <SheetContent>
           <SheetTitle>Notification</SheetTitle>
           <SheetDescription className="text-sm mb-2">
-            You have {notifications.filter((n) => !n.isRead).length} unread messages
+            You have {notifications.filter((n) => !n.isRead).length} unread
+            messages
           </SheetDescription>
           <div
             className="text-sm flex flex-row items-center cursor-pointer hover:text-blue-300"
             onClick={() => {
               onMarkAllAsRead()
-            }}>
+            }}
+          >
             <Check />
             <div>Mark all as read</div>
           </div>
@@ -164,16 +179,28 @@ const Notification = () => {
             <ScrollArea className="h-full" ref={scrollAreaRef}>
               <div className="py-4">
                 {notifications.map((notification, index) => (
-                  <div key={index} className="mb-4 grid grid-cols-[25px_1fr] items-start last:mb-0">
+                  <div
+                    key={index}
+                    className="mb-4 grid grid-cols-[25px_1fr] items-start last:mb-0"
+                  >
                     <span
                       className={`flex h-2 w-2 translate-y-1.5 rounded-full ${
                         notification.isRead ? "bg-gray-300" : "bg-sky-500"
                       }`}
                     />
                     <div className="space-y-1">
-                      <p className="text-sm font-medium leading-none">{notification.message}</p>
-                      <p className="text-sm text-muted-foreground">Reference: {notification.transactionTicketId}</p>
-                      <p className="text-sm text-muted-foreground">{moment(notification.creationTime).fromNow()}</p>
+                      <p className="text-sm font-medium leading-none">
+                        {notification.message}
+                      </p>
+                      <NotificationPopUp
+                        ticketID={notification.transactionTicketId}
+                      />
+                      <p className="text-sm text-muted-foreground">
+                        Reference: {notification.transactionTicketId}
+                      </p>
+                      <p className="text-sm text-muted-foreground">
+                        {moment(notification.creationTime).fromNow()}
+                      </p>
                     </div>
                   </div>
                 ))}
@@ -181,14 +208,18 @@ const Notification = () => {
                 {loading ? (
                   <div className="space-y-2">
                     <div className="flex items-center space-x-4">
-                      <span className={`flex h-2 w-2 translate-y-1.5 rounded-full bg-gray-300`} />
+                      <span
+                        className={`flex h-2 w-2 translate-y-1.5 rounded-full bg-gray-300`}
+                      />
                       <div className="space-y-2 w-full">
                         <Skeleton className="h-4 w-2/4" />
                         <Skeleton className="h-4 w-5/6" />
                       </div>
                     </div>
                     <div className="flex items-center space-x-4">
-                      <span className={`flex h-2 w-2 translate-y-1.5 rounded-full bg-gray-300`} />
+                      <span
+                        className={`flex h-2 w-2 translate-y-1.5 rounded-full bg-gray-300`}
+                      />
                       <div className="space-y-2 w-full">
                         <Skeleton className="h-4 w-2/4" />
                         <Skeleton className="h-4 w-5/6" />
@@ -201,8 +232,12 @@ const Notification = () => {
                 <div ref={observerRef} />
               </div>
             </ScrollArea>
-            {paginate.current === 1 && paginate.current * paginate.size < totalCount ? (
-              <Button className="w-full bg-gray-600 text-white" onClick={() => onLoadMore()}>
+            {paginate.current === 1 &&
+            paginate.current * paginate.size < totalCount ? (
+              <Button
+                className="w-full bg-gray-600 text-white"
+                onClick={() => onLoadMore()}
+              >
                 Load more here
               </Button>
             ) : (

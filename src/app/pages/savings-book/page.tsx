@@ -41,6 +41,7 @@ import WithdrawSavingBookModal from "@/components/pages/savings-book/WithdrawSav
 import { SAVING_BOOK_TRANSACTION_COMPLETE } from "../../../../utils/socket.enum"
 import DepositSavingBookModal from "@/components/pages/savings-book/DepositSavingBookModal"
 import TransactionHistoryPopUp from "@/components/pages/savings-book/TransactionHistory"
+import MonthlyInterestPopup from "@/components/pages/savings-book/MonthlyInterests"
 
 export interface BookRegulation {
   regulationIdRef: string
@@ -177,11 +178,16 @@ const columns: ColumnDef<SavingBook>[] = [
     },
   },
   {
-    header: "History",
+    header: "Transaction",
     cell: ({ row }) => {
       const savingBook = row.original
 
-      return <TransactionHistoryPopUp bookID={savingBook.accountId} />
+      return (
+        <div className="flex-col justify-center space-x-2 text-center cursor-pointer text-green-500 space-y-2">
+          <TransactionHistoryPopUp bookID={savingBook?.id} />
+          <MonthlyInterestPopup bookID={savingBook?.id} />
+        </div>
+      )
     },
   },
   {
@@ -199,22 +205,7 @@ const columns: ColumnDef<SavingBook>[] = [
           <span className="leading-6">Paynow</span>
         </div>
       ) : (
-        <div>
-          <div
-            className="flex justify-center space-x-2 text-center cursor-pointer text-green-500"
-            onClick={() => {}}
-          >
-            <History size={24} />
-            <span className="leading-6">Transaction History</span>
-          </div>
-          <div
-            className="flex justify-center space-x-2 text-center cursor-pointer text-green-500"
-            onClick={() => {}}
-          >
-            <ChartArea size={24} />
-            <span className="leading-6">Monthly Interests</span>
-          </div>
-        </div>
+        ""
       )
     },
   },

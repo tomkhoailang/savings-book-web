@@ -77,13 +77,13 @@ interface DataTableProps<
   metadata: Metadata<TData, TFormValues>
 }
 
-export function DataTable<
+export function DataTablePopup<
   TData extends AuditedEntity,
   TValue,
   TFormValues extends FieldValues
 >({ columns, metadata }: DataTableProps<TData, TValue, TFormValues>) {
   const dispatch = useDispatch()
-  const datatableReducer = useSelector(
+  const _datatableReducer = useSelector(
     (state: RootState) => state.datatableReducer
   )
   const socketReducer = useSelector((state: RootState) => state.socketReducer)
@@ -96,30 +96,30 @@ export function DataTable<
   const [isDeleteModalOpen, setIsDeleteModalOpen] = React.useState(false)
 
   let updatedColumns: ColumnDef<TData, TValue>[] = [...columns]
-  if (metadata.selectMultipleRow) {
-    updatedColumns.unshift({
-      id: "select",
-      header: ({ table }) => (
-        <Checkbox
-          checked={
-            table.getIsAllPageRowsSelected() ||
-            (table.getIsSomePageRowsSelected() && "indeterminate")
-          }
-          onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-          aria-label="Select all"
-        />
-      ),
-      cell: ({ row }) => (
-        <Checkbox
-          checked={row.getIsSelected()}
-          onCheckedChange={(value) => row.toggleSelected(!!value)}
-          aria-label="Select row"
-        />
-      ),
-      enableSorting: false,
-      enableHiding: false,
-    })
-  }
+  // if (metadata.selectMultipleRow) {
+  //   updatedColumns.unshift({
+  //     id: "select",
+  //     header: ({ table }) => (
+  //       <Checkbox
+  //         checked={
+  //           table.getIsAllPageRowsSelected() ||
+  //           (table.getIsSomePageRowsSelected() && "indeterminate")
+  //         }
+  //         onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+  //         aria-label="Select all"
+  //       />
+  //     ),
+  //     cell: ({ row }) => (
+  //       <Checkbox
+  //         checked={row.getIsSelected()}
+  //         onCheckedChange={(value) => row.toggleSelected(!!value)}
+  //         aria-label="Select row"
+  //       />
+  //     ),
+  //     enableSorting: false,
+  //     enableHiding: false,
+  //   })
+  // }
   if (metadata.update) {
     updatedColumns.push({
       id: "actions",
@@ -142,7 +142,7 @@ export function DataTable<
     })
   }
 
-  const [pageSize, setPageSize] = React.useState(25)
+  const [pageSize, setPageSize] = React.useState(10)
   const [data, setData] = React.useState<TData[]>([])
   const [totalCount, setTotalCount] = React.useState(0)
   const path = usePathname()
@@ -177,7 +177,7 @@ export function DataTable<
   const whenCreateClose = (resData: TData) => {
     const newData = [resData, ...data]
     setData(newData)
-    dispatch(updateTotalRow(datatableReducer.totalCount + 1))
+    dispatch(updateTotalRow(_datatableReducer.totalCount + 1))
   }
 
   const handleDelete = async () => {
@@ -192,15 +192,15 @@ export function DataTable<
 
     if (res.status === 204) {
       const newLength = data.length - filteredData.length
-      if (newLength === 0 && datatableReducer.pagination.current > 1) {
+      if (newLength === 0 && _datatableReducer.pagination.current > 1) {
         dispatch(
           pageChange({
-            current: datatableReducer.pagination.current - 1,
-            size: datatableReducer.pagination.size,
+            current: _datatableReducer.pagination.current - 1,
+            size: _datatableReducer.pagination.size,
           })
         )
       } else {
-        fetchData(metadata.getUrl + datatableReducer.query)
+        fetchData(metadata.getUrl + _datatableReducer.query)
       }
       setRowSelection({})
       setIsDeleteModalOpen(false)
@@ -212,8 +212,8 @@ export function DataTable<
   // }, [])
 
   const memoizedQuery = useMemo(() => {
-    return datatableReducer.query
-  }, [datatableReducer.query])
+    return _datatableReducer.query
+  }, [_datatableReducer.query])
 
   // useEffect(() => {
   //   console.log("check query", pathRef.current, memoizedQuery)
@@ -232,11 +232,11 @@ export function DataTable<
     fetchData(metadata.getUrl + memoizedQuery)
   }, [memoizedQuery])
   useEffect(() => {
-    setTotalCount(datatableReducer.totalCount)
-  }, [datatableReducer.totalCount])
+    setTotalCount(_datatableReducer.totalCount)
+  }, [_datatableReducer.totalCount])
   useEffect(() => {
-    setPageSize(datatableReducer.pagination.size)
-  }, [datatableReducer.pagination.size])
+    setPageSize(_datatableReducer.pagination.size)
+  }, [_datatableReducer.pagination.size])
 
   useEffect(() => {
     if (metadata.socket && socketReducer.type !== "") {
@@ -415,7 +415,7 @@ export function DataTable<
                 />
               </SelectTrigger>
               <SelectContent side="top">
-                {datatableReducer.sizePerPage.map((pageSize) => (
+                {_datatableReducer.sizePerPage.map((pageSize) => (
                   <SelectItem key={pageSize} value={`${pageSize}`}>
                     {pageSize}
                   </SelectItem>
@@ -424,7 +424,7 @@ export function DataTable<
             </Select>
           </div>
           <div className="flex w-[100px] items-center justify-center text-sm font-medium">
-            Page {datatableReducer.pagination.current} of{" "}
+            Page {_datatableReducer.pagination.current} of{" "}
             {Math.ceil(totalCount / table.getState().pagination.pageSize)}
           </div>
           <div className="flex items-center space-x-2">
@@ -434,7 +434,7 @@ export function DataTable<
               onClick={() => {
                 onPage(1, pageSize)
               }}
-              disabled={datatableReducer.pagination.current <= 1}
+              disabled={_datatableReducer.pagination.current <= 1}
             >
               <span className="sr-only">Go to first page</span>
               <DoubleArrowLeftIcon className="h-4 w-4" />
@@ -443,9 +443,9 @@ export function DataTable<
               variant="outline"
               className="h-8 w-8 p-0"
               onClick={() => {
-                onPage(datatableReducer.pagination.current - 1, pageSize)
+                onPage(_datatableReducer.pagination.current - 1, pageSize)
               }}
-              disabled={datatableReducer.pagination.current <= 1}
+              disabled={_datatableReducer.pagination.current <= 1}
             >
               <span className="sr-only">Go to previous page</span>
               <ChevronLeftIcon className="h-4 w-4" />
@@ -454,10 +454,10 @@ export function DataTable<
               variant="outline"
               className="h-8 w-8 p-0"
               onClick={() => {
-                onPage(datatableReducer.pagination.current + 1, pageSize)
+                onPage(_datatableReducer.pagination.current + 1, pageSize)
               }}
               disabled={
-                datatableReducer.pagination.current >=
+                _datatableReducer.pagination.current >=
                 Math.ceil(totalCount / table.getState().pagination.pageSize)
               }
             >
@@ -474,7 +474,7 @@ export function DataTable<
                 )
               }}
               disabled={
-                datatableReducer.pagination.current >=
+                _datatableReducer.pagination.current >=
                 Math.ceil(totalCount / table.getState().pagination.pageSize)
               }
             >

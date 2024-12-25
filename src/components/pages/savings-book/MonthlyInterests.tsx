@@ -3,8 +3,7 @@ import moment from "moment"
 import { z } from "zod"
 import { ColumnDef } from "@tanstack/react-table"
 import { Checkbox } from "@/components/ui/checkbox"
-import { BookDown, Check, History, List, MoreHorizontal } from "lucide-react"
-import { useEffect, useState } from "react"
+import { BookDown, ChartArea, Check, List, MoreHorizontal } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -40,56 +39,27 @@ import { CreateUpdateRegulationModal } from "@/components/pages/regulations/Crea
 import { Metadata } from "@/app/interfaces/metadata"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { DataTable } from "@/components/common/datatable/Datatable"
+import { useState } from "react"
 import { DataTablePopup } from "@/components/common/datatable/DatatablePopup"
 
-const transactionTypeDict: Record<string, string> = {
-  deposit: "Deposit",
-  withdraw: "Withdraw",
-}
-const transactionStatusDict: Record<string, string> = {
-  success: "Success",
-  pending: "Pending",
-  abort: "Abort",
+export interface MonthlyInterestOutput extends AuditedEntity {
+  savingBookId: string
+  amount: number
+  interestRate: number
 }
 
-export interface TransactionTicket extends AuditedEntity {
-  savingBookId: string // Equivalent to primitive.ObjectID
-  transactionDate: Date
-  status: string
-  email: string
-
-  paymentLink: string
-  paymentType: string
-  paymentId: string
-  paymentAmount: number
-}
-
-const columns: ColumnDef<TransactionTicket>[] = [
+const columns: ColumnDef<MonthlyInterestOutput>[] = [
   {
-    accessorKey: "paymentId",
-    header: "Payment ID",
+    accessorKey: "savingBookId",
+    header: "Saving Book",
   },
   {
-    accessorKey: "email",
-    header: "Email",
+    accessorKey: "interestRate",
+    header: "InterestRate",
   },
   {
-    accessorKey: "paymentAmount",
-    header: "Payment Amount",
-  },
-  {
-    header: "Payment Type",
-    cell: ({ row }) => {
-      const ticket = row.original
-      return transactionTypeDict[ticket.paymentType]
-    },
-  },
-  {
-    header: "Transaction result",
-    cell: ({ row }) => {
-      const ticket = row.original
-      return transactionStatusDict[ticket.status]
-    },
+    accessorKey: "amount",
+    header: "Increase amount",
   },
   {
     accessorKey: "creationTime",
@@ -101,15 +71,26 @@ const columns: ColumnDef<TransactionTicket>[] = [
     },
   },
 ]
-const TransactionTicketSchema = z.object({})
+const MonthlyInterestOutputSchema = z.object({})
 
-export type TransactionTicketFormValues = z.infer<
-  typeof TransactionTicketSchema
+export type MonthlyInterestOutputFormValues = z.infer<
+  typeof MonthlyInterestOutputSchema
 >
 
-const TransactionHistoryPopUp = ({ bookID }: { bookID: any }) => {
-  const metadata: Metadata<TransactionTicket, TransactionTicketFormValues> = {
-    getUrl: "/saving-book/" + bookID + "/transaction-ticket",
+const metadata: Metadata<
+  MonthlyInterestOutput,
+  MonthlyInterestOutputFormValues
+> = {
+  getUrl: "/monthly-saving-interest",
+  selectMultipleRow: true,
+}
+
+const MonthlyInterestPopup = ({ bookID }: { bookID: any }) => {
+  const metadata: Metadata<
+    MonthlyInterestOutput,
+    MonthlyInterestOutputFormValues
+  > = {
+    getUrl: "/saving-book/" + bookID + "/monthly-interest",
     selectMultipleRow: true,
   }
   const [open, setOpen] = useState(false)
@@ -120,13 +101,13 @@ const TransactionHistoryPopUp = ({ bookID }: { bookID: any }) => {
         <DialogTrigger asChild>
           <Button variant="outline">
             {" "}
-            <History /> <span>Transaction History</span>
+            <ChartArea /> <span>Monthly Interests</span>
           </Button>
         </DialogTrigger>
 
         <DialogContent className="sm:max-w-[1200px]">
           <DialogHeader>
-            <DialogTitle>Transaction History</DialogTitle>
+            <DialogTitle>Monthly Interests</DialogTitle>
             <DialogDescription></DialogDescription>
           </DialogHeader>
           <DataTablePopup columns={columns} metadata={metadata} />
@@ -136,4 +117,4 @@ const TransactionHistoryPopUp = ({ bookID }: { bookID: any }) => {
   )
 }
 
-export default TransactionHistoryPopUp
+export default MonthlyInterestPopup

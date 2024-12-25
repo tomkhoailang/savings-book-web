@@ -34,6 +34,7 @@ import { DialogHeader, DialogFooter, DialogDescription, DialogTrigger } from "@/
 import { Dialog, DialogContent, DialogTitle } from "@radix-ui/react-dialog"
 import { FormProvider } from "react-hook-form"
 import ConfirmBanModal from "@/components/pages/user/ConfirmBanModal"
+import { useAuth } from "@/app/contexts/authContext"
 
 export interface User extends AuditedEntity {
   username: string
@@ -50,6 +51,8 @@ const metadata: Metadata<User, UserFormValues> = {
 }
 
 const UserPage = () => {
+  const authContext = useAuth()
+
   const columns: ColumnDef<User>[] = [
     {
       accessorKey: "username",
@@ -82,7 +85,7 @@ const UserPage = () => {
       cell: ({ row }) => {
         return (
           <div className="flex justify-center ">
-            <ConfirmBanModal user={row.original}/>
+            <ConfirmBanModal user={row.original} />
           </div>
         )
       },

@@ -137,22 +137,21 @@ export const interceptorService = (store: AppDispatch) => {
               error({
                 variant: "destructive",
                 title: "Bad request",
-                message: mesasge.error ?? `${mesasge[0]?.message + mesasge[0]?.field}`,
+                message:
+                  mesasge.error ?? `${mesasge[0]?.message + mesasge[0]?.field}`,
                 description: "",
               })
             )
             resolve(err)
           })
         case 401:
-          localStorage.removeItem("accessToken")
-          localStorage.removeItem("refreshToken")
-          localStorage.removeItem("currentUser")
           return new Promise((resolve, reject) => {
             store.dispatch(
               error({
                 variant: "destructive",
                 title: "Unauthorized",
-                message: "You don't have enough permission to perform this action",
+                message:
+                  "You don't have enough permission to perform this action",
                 description: "",
               })
             )

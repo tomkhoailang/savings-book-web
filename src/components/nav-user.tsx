@@ -25,6 +25,9 @@ import { useEffect } from "react"
 import { SocketHelper } from "../../utils/socketHelper"
 import { setData } from "@/app/reducers/socketReducer"
 import { useRouter } from "next/navigation"
+import { Dialog } from "@radix-ui/react-dialog"
+import ChangePassword from "./pages/user/ChangePasswordModal"
+import { CreateUpdateRegulationModal } from "./pages/regulations/CreateUpdateRegulationModal"
 
 export function NavUser({ user }: { user: any }) {
   const { isMobile } = useSidebar()
@@ -60,7 +63,6 @@ export function NavUser({ user }: { user: any }) {
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
             >
               <Avatar className="h-8 w-8 rounded-lg">
-                {/* <AvatarImage /> */}
                 <AvatarFallback className="rounded-lg">CN</AvatarFallback>
               </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight">
@@ -79,7 +81,6 @@ export function NavUser({ user }: { user: any }) {
             <DropdownMenuLabel className="p-0 font-normal">
               <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                 <Avatar className="h-8 w-8 rounded-lg">
-                  {/* <AvatarImage src={user.avatar} alt={user.name} /> */}
                   <AvatarFallback className="rounded-lg">CN</AvatarFallback>
                 </Avatar>
                 <div className="grid flex-1 text-left text-sm leading-tight">
@@ -90,37 +91,19 @@ export function NavUser({ user }: { user: any }) {
                 </div>
               </div>
             </DropdownMenuLabel>
-            {/* <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              <DropdownMenuItem>
-                <Sparkles />
-                Upgrade to Pro
-              </DropdownMenuItem>
-            </DropdownMenuGroup>
-            <DropdownMenuSeparator /> */}
-            <DropdownMenuGroup>
-              {/* <DropdownMenuItem>
-                <BadgeCheck />
-                Account
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <ComponentPlaceholderIcon />
-                Billing
-              </DropdownMenuItem> */}
               <DropdownMenuItem>
                 <Bell />
                 Notifications
               </DropdownMenuItem>
-              <DropdownMenuItem>
-                <Pen />
-                Change Password
+              <DropdownMenuItem asChild>
+                <ChangePassword />
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuItem
               onClick={() => {
                 authContext?.logout()
-                // router.push("/login")
               }}
             >
               <LogOut />

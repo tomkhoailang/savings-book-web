@@ -19,7 +19,7 @@ export default function DailyReport() {
     if (date) {
       fetchDailyReport(date)
     }
-  }, [])
+  }, [date])
 
   return (
     <Card className="max-w-4xl mx-auto mb-4 ">

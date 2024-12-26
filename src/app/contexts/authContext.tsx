@@ -60,6 +60,7 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
     setAccessToken(null)
     setRefreshToken(null)
     setCurrentUser(null)
+    
     localStorage.removeItem("accessToken")
     localStorage.removeItem("refreshToken")
     localStorage.removeItem("currentUser")

@@ -87,9 +87,9 @@ const columns: ColumnDef<SavingBook>[] = [
     cell: ({ row }) => {
       const savingBook = row.original
 
-      return `${savingBook.address?.street ?? ""} ${
-        savingBook.address?.city ?? ""
-      } ${savingBook.address?.country ?? ""}`
+      return `${savingBook.address?.street ?? ""} ${savingBook.address?.city ?? ""} ${
+        savingBook.address?.country ?? ""
+      }`
     },
   },
   {
@@ -113,8 +113,7 @@ const columns: ColumnDef<SavingBook>[] = [
     cell: ({ row }) => {
       const savingBook = row.original
 
-      if (savingBook.totalEarnings)
-        return `${Math.floor(savingBook.totalEarnings * 100) / 100} $`
+      if (savingBook.totalEarnings) return `${Math.floor(savingBook.totalEarnings * 100) / 100} $`
       return ""
     },
   },
@@ -131,11 +130,7 @@ const columns: ColumnDef<SavingBook>[] = [
           break
         }
       }
-      if (
-        latestAppliedReg &&
-        latestAppliedReg.termInMonth === 0 &&
-        savingBook.balance > 0
-      ) {
+      if (latestAppliedReg && latestAppliedReg.termInMonth === 0 && savingBook.balance > 0) {
         return `No term - ${statusMap[savingBook.status]}`
       }
 
@@ -167,10 +162,7 @@ const columns: ColumnDef<SavingBook>[] = [
       const savingBook = row.original
       console.log(savingBook.balance)
 
-      if (
-        moment(savingBook.nextScheduleMonth).isBefore(moment()) ||
-        savingBook.balance === 0
-      ) {
+      if (moment(savingBook.nextScheduleMonth).isBefore(moment()) || savingBook.balance === 0) {
         return ""
       }
 
@@ -199,8 +191,7 @@ const columns: ColumnDef<SavingBook>[] = [
           className="flex justify-center space-x-2 text-center cursor-pointer text-green-500"
           onClick={() => {
             window.location.href = `${savingBook.paymentUrl}`
-          }}
-        >
+          }}>
           <CreditCard size={24} />
           <span className="leading-6">Paynow</span>
         </div>
@@ -225,11 +216,22 @@ const columns: ColumnDef<SavingBook>[] = [
       }
 
       if (latestAppliedReg) {
-        if (
-          Math.floor(savingBook.balance * 100) / 100 <
-          latestAppliedReg.minWithDrawValue
-        ) {
+        if (Math.floor(savingBook.balance * 100) / 100 < latestAppliedReg.minWithDrawValue) {
           return ""
+        }
+
+        const now = new Date()
+        const applyDate = new Date(latestAppliedReg.applyDate)
+
+        if (latestAppliedReg.termInMonth === 0) {
+          return (
+            <div>
+              <DepositSavingBookModal savingBook={savingBook} />
+              {Math.floor((now.getTime() - applyDate.getTime()) / 1000) > latestAppliedReg.minWithDrawDay && (
+                <WithdrawSavingBookModal savingBook={savingBook} />
+              )}
+            </div>
+          )
         }
 
         if (savingBook.status === "expired") {
@@ -241,20 +243,14 @@ const columns: ColumnDef<SavingBook>[] = [
           )
         }
 
-        const now = new Date()
-        const applyDate = new Date(latestAppliedReg.applyDate)
-
         if (
-          Math.floor((now.getTime() - applyDate.getTime()) / 1000) >
-            latestAppliedReg.minWithDrawDay &&
+          Math.floor((now.getTime() - applyDate.getTime()) / 1000) > latestAppliedReg.minWithDrawDay &&
           latestAppliedReg.termInMonth === 0
         ) {
           return (
             <div className="flex flex-row space-x-2">
               <WithdrawSavingBookModal savingBook={savingBook} />
-              {savingBook.paymentUrl === "" && (
-                <DepositSavingBookModal savingBook={savingBook} />
-              )}
+              {savingBook.paymentUrl === "" && <DepositSavingBookModal savingBook={savingBook} />}
             </div>
           )
         }
@@ -340,8 +336,7 @@ const SavingBookPage = () => {
       toast({
         title: "Payment Successful!",
         variant: "success",
-        description:
-          " Thank you for your payment. Your transaction has been completed.",
+        description: " Thank you for your payment. Your transaction has been completed.",
         duration: 1500,
       })
     } else {

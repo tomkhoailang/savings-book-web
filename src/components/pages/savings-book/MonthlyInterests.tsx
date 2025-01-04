@@ -95,7 +95,7 @@ const MonthlyInterestPopup = ({ bookID }: { bookID: any }) => {
     <div className="flex justify-center space-x-2 text-center cursor-pointer text-green-500">
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogTrigger asChild>
-          <Button variant="outline">
+          <Button variant="outline" style={{width:"180px"}}>
             {" "}
             <ChartArea /> <span>Monthly Interests</span>
           </Button>

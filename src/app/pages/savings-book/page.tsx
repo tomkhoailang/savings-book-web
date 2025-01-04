@@ -170,12 +170,12 @@ const columns: ColumnDef<SavingBook>[] = [
     },
   },
   {
-    header: "Transaction",
+    header: "Transactions",
     cell: ({ row }) => {
       const savingBook = row.original
 
       return (
-        <div className="flex-col justify-center space-x-2 text-center cursor-pointer text-green-500 space-y-2">
+        <div className="flex flex-col justify-center space-y-1 text-center cursor-pointer text-green-500">
           <TransactionHistoryPopUp bookID={savingBook?.id} />
           <MonthlyInterestPopup bookID={savingBook?.id} />
         </div>
@@ -225,7 +225,7 @@ const columns: ColumnDef<SavingBook>[] = [
 
         if (latestAppliedReg.termInMonth === 0) {
           return (
-            <div>
+            <div className="flex flex-col space-y-1">
               <DepositSavingBookModal savingBook={savingBook} />
               {Math.floor((now.getTime() - applyDate.getTime()) / 1000) > latestAppliedReg.minWithDrawDay && (
                 <WithdrawSavingBookModal savingBook={savingBook} />
@@ -236,7 +236,7 @@ const columns: ColumnDef<SavingBook>[] = [
 
         if (savingBook.status === "expired") {
           return (
-            <div className="flex flex-row space-x-2">
+            <div className="flex flex-col space-y-1">
               <WithdrawSavingBookModal savingBook={savingBook} />
               <DepositSavingBookModal savingBook={savingBook} />
             </div>
@@ -248,7 +248,7 @@ const columns: ColumnDef<SavingBook>[] = [
           latestAppliedReg.termInMonth === 0
         ) {
           return (
-            <div className="flex flex-row space-x-2">
+            <div className="flex flex-col space-y-1">
               <WithdrawSavingBookModal savingBook={savingBook} />
               {savingBook.paymentUrl === "" && <DepositSavingBookModal savingBook={savingBook} />}
             </div>

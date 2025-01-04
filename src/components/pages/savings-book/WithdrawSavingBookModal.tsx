@@ -73,7 +73,7 @@ const WithdrawSavingBookModal = ({ savingBook }: { savingBook: SavingBook }) => 
     <div className="flex justify-center space-x-2 text-center cursor-pointer text-green-500">
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogTrigger asChild>
-          <Button variant="outline">
+          <Button variant="outline" style={{width:"100px"}}>
             {" "}
             <WalletCards /> <span>Withdraw</span>
           </Button>

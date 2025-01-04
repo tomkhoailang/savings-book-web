@@ -294,7 +294,7 @@ export function DataTable<
             </Badge>
           </div>
           <div className="space-x-5 flex flex-row justify-center">
-            {!authContext?.currentUser?.roles.includes("Admin") && metadata.create && (
+            {authContext?.currentUser?.roles.includes("Admin") && metadata.create && (
               <Button
                 className="bg-green-600 rounded-lg"
                 onClick={() => {

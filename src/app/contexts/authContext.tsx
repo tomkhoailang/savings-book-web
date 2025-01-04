@@ -20,6 +20,7 @@ type AuthContextType = {
   refreshToken: string | null
   login: (accessToken: string, refreshToken: string) => void
   logout: () => void
+  clear: () => void
   loading: boolean
 }
 
@@ -67,10 +68,19 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
 
     router.push("/login")
   }
+  const clear = () => {
+    setAccessToken(null)
+    setRefreshToken(null)
+    setCurrentUser(null)
+    
+    localStorage.removeItem("accessToken")
+    localStorage.removeItem("refreshToken")
+    localStorage.removeItem("currentUser")
+  }
 
   return (
     <AuthContext.Provider
-      value={{ accessToken, refreshToken, currentUser, login, logout, loading }}
+      value={{ accessToken, refreshToken, currentUser, login, logout, loading, clear }}
     >
       {children}
     </AuthContext.Provider>

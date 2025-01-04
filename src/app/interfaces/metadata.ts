@@ -1,3 +1,4 @@
+import { string } from 'zod';
 import { DefaultValues, FieldValues, Resolver } from "react-hook-form"
 
 
@@ -16,10 +17,12 @@ export interface Metadata<
   create?: {
     component: (data: TData | null) => React.ReactNode
     url: string
+    role?: string
   }
   update?: {
     component: (data: TData | null) => React.ReactNode
     url: string
+    role?: string
   }
   socket?: SocketType[]
   deleteUrl?: string,

@@ -294,7 +294,7 @@ export function DataTable<
             </Badge>
           </div>
           <div className="space-x-5 flex flex-row justify-center">
-            {authContext?.currentUser?.roles.includes("Admin") && metadata.create && (
+            { metadata.create  && authContext?.currentUser?.roles.includes(metadata.create.role?? "") && (
               <Button
                 className="bg-green-600 rounded-lg"
                 onClick={() => {
@@ -487,7 +487,7 @@ export function DataTable<
         </div>
       </div>
 
-      {metadata.update && (
+      {metadata.update &&  authContext?.currentUser?.roles.includes(metadata.update.role?? "") &&(
         <UpdateModal
           metadata={metadata}
           isOpen={isUpdateModalOpen}

@@ -17,10 +17,10 @@ export default function RootLayoutProviders({ children }: { children: React.Reac
       <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
         <AuthProvider>
           <NotificationProvier>{children}</NotificationProvier>
+          <LoadingOverlay />
+          <ToastBar />
+          <Toaster />
         </AuthProvider>
-        <LoadingOverlay />
-        <ToastBar />
-        <Toaster />
       </ThemeProvider>
     </Provider>
   )

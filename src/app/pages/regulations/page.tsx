@@ -161,12 +161,14 @@ const metadata: Metadata<SavingRegulation, SavingRegulationFormValues> = {
       return <CreateUpdateRegulationModal data={data} />
     },
     url: "/regulation",
+    role: "Admin"
   },
   update: {
     component: (data) => {
       return <CreateUpdateRegulationModal data={data} />
     },
     url: "/regulation",
+    role: "Admin"
   },
   formSchema: zodResolver(SavingRegulationSchema),
   getDefaultValue: (data) => {

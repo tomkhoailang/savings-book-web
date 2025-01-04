@@ -282,6 +282,7 @@ const metadata: Metadata<SavingBook, SavingBookFormValues> = {
       return <CreateUpdateSavingBookModal data={data} />
     },
     url: "/saving-book",
+    role: "User"
   },
   formSchema: zodResolver(SavingBookSchema),
   socket: [

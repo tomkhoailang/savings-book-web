@@ -46,8 +46,7 @@ const confirmChangePasswordSchema = z
       })
       .regex(/[a-z]/, {
         message: "Password must contain at least one lowercase letter",
-      })
-      .regex(/[0-9]/, { message: "Password must contain at least one number" }),
+      }),
     confirmPassword: z.string(),
   })
   .refine((data) => data.newPassword === data.confirmPassword, {

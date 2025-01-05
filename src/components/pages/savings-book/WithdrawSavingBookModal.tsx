@@ -133,7 +133,7 @@ const WithdrawSavingBookModal = ({ savingBook }: { savingBook: SavingBook }) => 
                   />
                 </div>
                 {latestAppliedReg.termInMonth !== 0 && (
-                  <span className="text-yellow-300">
+                  <span className="text-yellow-800">
                     Since your regulation isn't demand term. You can only
                     withdraw all your balance this time
                   </span>

@@ -19,6 +19,7 @@ const excludeResponseUrlRegex = [
   /^\/notification\$/,
   /^\/auth\/logout$/,
   /^\/auth\/confirm-reset-password$/,
+  /^\/auth\/change-password$/,
 ]
 
 export const interceptorService = (store: AppDispatch) => {
@@ -83,10 +84,11 @@ export const interceptorService = (store: AppDispatch) => {
             )
             break
           case "post":
+            const msg = currentUrl.includes("auth/change-password") ? "Change password sucessfully" : "Create successfully"
             store.dispatch(
               success({
                 variant: "success",
-                title: "Create successfully",
+                title: msg,
                 message: "Your changes have been saved",
                 description: "",
               })

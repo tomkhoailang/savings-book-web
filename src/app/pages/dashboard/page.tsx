@@ -130,7 +130,7 @@ const Dashboard = () => {
                     <TableCell className="text-base">{moment(item.currentDate).format("DD/MM/YYYY")}</TableCell>
                     <TableCell className="text-right text-base">{item.OpenCount}</TableCell>
                     <TableCell className="text-right text-base">{item.ClosedCount}</TableCell>
-                    <TableCell className="text-right text-base">{item.DifferentCount}</TableCell>
+                    <TableCell className="text-right text-base">{Math.round(item.DifferentCount * 100) / 100}</TableCell>
                   </TableRow>
                 ))}
               </TableBody>

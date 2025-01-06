@@ -112,7 +112,7 @@ export default function MonthlyReport() {
                   <TableCell className="text-base">{item.RegulationType}</TableCell>
                   <TableCell className="text-right text-base">{item.Income}</TableCell>
                   <TableCell className="text-right text-base">{item.Outcome}</TableCell>
-                  <TableCell className="text-right text-base">{item.DifferentCount}</TableCell>
+                  <TableCell className="text-right text-base">{Math.round(item.DifferentCount * 100) / 100}</TableCell>
                 </TableRow>
               ))}
             </TableBody>
